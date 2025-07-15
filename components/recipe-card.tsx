@@ -32,7 +32,7 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe, onSaveAction, onAddToGroceryAction, onViewDetailsAction, isSaved }: RecipeCardProps) {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-800">
+    <Card className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-800">
       <div className="relative">
         <Image
           src={recipe.image || "/placeholder.svg"}

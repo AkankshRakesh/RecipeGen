@@ -581,7 +581,7 @@ export default function RecipeGenerator() {
           </TabsContent>
         </Tabs>
       </div>
-      <RecipeDetailModal recipeId={selectedRecipeId} isOpen={isRecipeModalOpen} onClose={closeRecipeModal} />
+      <RecipeDetailModal recipeId={selectedRecipeId} isOpen={isRecipeModalOpen} onCloseAction={closeRecipeModal} />
     </div>
   )
 }
