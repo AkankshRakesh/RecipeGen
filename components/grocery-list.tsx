@@ -11,22 +11,22 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 interface GroceryListProps {
   items: string[]
-  onUpdateItems: (items: string[]) => void
+  onUpdateItemsAction: (items: string[]) => void
 }
 
-export function GroceryList({ items, onUpdateItems }: GroceryListProps) {
+export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
   const [newItem, setNewItem] = useState("")
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set())
 
   const addItem = () => {
     if (newItem.trim() && !items.includes(newItem.trim())) {
-      onUpdateItems([...items, newItem.trim()])
+      onUpdateItemsAction([...items, newItem.trim()])
       setNewItem("")
     }
   }
 
   const removeItem = (item: string) => {
-    onUpdateItems(items.filter((i) => i !== item))
+    onUpdateItemsAction(items.filter((i) => i !== item))
     setCheckedItems((prev) => {
       const newSet = new Set(prev)
       newSet.delete(item)
@@ -54,7 +54,7 @@ export function GroceryList({ items, onUpdateItems }: GroceryListProps) {
 
   const clearCompleted = () => {
     const remainingItems = items.filter((item) => !checkedItems.has(item))
-    onUpdateItems(remainingItems)
+    onUpdateItemsAction(remainingItems)
     setCheckedItems(new Set())
   }
 
