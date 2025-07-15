@@ -6,7 +6,6 @@ import { X, ChefHat, Loader2, Clock, Users, Star, Youtube, ExternalLink } from "
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 
 interface MealDBRecipe {
@@ -131,9 +130,9 @@ export function RecipeDetailModal({ recipeId, isOpen, onCloseAction }: RecipeDet
             </Button>
           </div>
         ) : recipe ? (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full max-h-[95vh]">
             {/* Header with Image */}
-            <div className="relative h-64 md:h-80">
+            <div className="relative h-64 md:h-80 flex-shrink-0">
               <Image
                 src={recipe.strMealThumb || "/placeholder.svg"}
                 alt={recipe.strMeal}
@@ -179,7 +178,7 @@ export function RecipeDetailModal({ recipeId, isOpen, onCloseAction }: RecipeDet
             </div>
 
             {/* Content */}
-            <ScrollArea className="flex-1">
+            <div className="flex-1 overflow-y-auto">
               <div className="p-6 space-y-8">
                 {/* Quick Actions */}
                 {(recipe.strYoutube || recipe.strSource) && (
@@ -249,7 +248,7 @@ export function RecipeDetailModal({ recipeId, isOpen, onCloseAction }: RecipeDet
                 {/* Bottom Spacing */}
                 <div className="h-4" />
               </div>
-            </ScrollArea>
+            </div>
           </div>
         ) : null}
       </DialogContent>
