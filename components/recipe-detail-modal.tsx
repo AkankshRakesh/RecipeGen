@@ -112,7 +112,7 @@ export function RecipeDetailModal({ recipeId, isOpen, onCloseAction }: RecipeDet
 
   return (
     <Dialog open={isOpen} onOpenChange={onCloseAction}>
-      <DialogContent className="max-w-5xl max-h-[95vh] p-0 gap-0">
+      <DialogContent className="max-w-5xl max-h-[95vh] p-0 gap-0 overflow-hidden">
       <DialogTitle className="sr-only">{recipe?.strMeal || "Recipe Details"}</DialogTitle>
         {loading ? (
           <div className="flex items-center justify-center py-16">
