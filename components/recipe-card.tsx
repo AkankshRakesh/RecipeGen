@@ -1,36 +1,50 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Clock, Users, Star, Heart, ShoppingCart, MapPin, Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import Image from "next/image";
+import {
+  Clock,
+  Users,
+  Star,
+  Heart,
+  ShoppingCart,
+  MapPin,
+  Eye,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface Recipe {
-  id: string
-  title: string
-  image: string
-  cookTime: string
-  servings: number
-  rating: number
-  ingredients: string[]
-  difficulty: string
-  description: string
-  instructions: string
-  category: string
-  area: string
-  matchedIngredients: string[]
+  id: string;
+  title: string;
+  image: string;
+  cookTime: string;
+  servings: number;
+  rating: number;
+  ingredients: string[];
+  difficulty: string;
+  description: string;
+  instructions: string;
+  category: string;
+  area: string;
+  matchedIngredients: string[];
 }
 
 interface RecipeCardProps {
-  recipe: Recipe
-  onSaveAction: () => void
-  onAddToGroceryAction: () => void
-  onViewDetailsAction: (recipeId: string) => void
-  isSaved: boolean
+  recipe: Recipe;
+  onSaveAction: () => void;
+  onAddToGroceryAction: () => void;
+  onViewDetailsAction: (recipeId: string) => void;
+  isSaved: boolean;
 }
 
-export function RecipeCard({ recipe, onSaveAction, onAddToGroceryAction, onViewDetailsAction, isSaved }: RecipeCardProps) {
+export function RecipeCard({
+  recipe,
+  onSaveAction,
+  onAddToGroceryAction,
+  onViewDetailsAction,
+  isSaved,
+}: RecipeCardProps) {
   return (
     <Card className="hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-800">
       <div className="relative">
@@ -52,12 +66,18 @@ export function RecipeCard({ recipe, onSaveAction, onAddToGroceryAction, onViewD
         >
           {recipe.difficulty}
         </Badge>
-        <Badge className="absolute top-2 left-2 bg-blue-500">{recipe.category}</Badge>
+        <Badge className="absolute top-2 left-2 bg-blue-500">
+          {recipe.category}
+        </Badge>
       </div>
 
       <CardHeader className="pb-2">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-white line-clamp-1">{recipe.title}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{recipe.description}</p>
+        <h3 className="font-semibold text-lg text-gray-900 dark:text-white line-clamp-1">
+          {recipe.title}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+          {recipe.description}
+        </p>
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <MapPin className="h-3 w-3" />
           <span>{recipe.area}</span>
@@ -91,17 +111,27 @@ export function RecipeCard({ recipe, onSaveAction, onAddToGroceryAction, onViewD
                   ✓ {ingredient}
                 </Badge>
               ))}
-              {recipe.ingredients.slice(0, 3 - recipe.matchedIngredients.length).map((ingredient) => (
-                <Badge key={ingredient} variant="outline" className="text-xs capitalize">
-                  {ingredient}
-                </Badge>
-              ))}
+              {recipe.ingredients
+                .slice(0, 3 - recipe.matchedIngredients.length)
+                .map((ingredient) => (
+                  <Badge
+                    key={ingredient}
+                    variant="outline"
+                    className="text-xs capitalize"
+                  >
+                    {ingredient}
+                  </Badge>
+                ))}
             </>
           )}
           {recipe.matchedIngredients.length === 0 && (
             <>
               {recipe.ingredients.slice(0, 3).map((ingredient) => (
-                <Badge key={ingredient} variant="outline" className="text-xs capitalize">
+                <Badge
+                  key={ingredient}
+                  variant="outline"
+                  className="text-xs capitalize"
+                >
                   {ingredient}
                 </Badge>
               ))}
@@ -133,15 +163,22 @@ export function RecipeCard({ recipe, onSaveAction, onAddToGroceryAction, onViewD
             onClick={onSaveAction}
             className={`flex-1 ${isSaved ? "bg-red-50 border-red-200 text-red-700 dark:bg-red-950 dark:border-red-800 dark:text-red-300" : ""}`}
           >
-            <Heart className={`h-4 w-4 mr-1 ${isSaved ? "fill-current" : ""}`} />
+            <Heart
+              className={`h-4 w-4 mr-1 ${isSaved ? "fill-current" : ""}`}
+            />
             {isSaved ? "Saved" : "Save"}
           </Button>
-          <Button variant="outline" size="sm" onClick={onAddToGroceryAction} className="flex-1 bg-transparent">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAddToGroceryAction}
+            className="flex-1 bg-transparent"
+          >
             <ShoppingCart className="h-4 w-4 mr-1" />
             Add to List
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
