@@ -20,7 +20,7 @@ interface Recipe {
 
 interface SavedRecipesProps {
   recipes: Recipe[]
-  onAddToGrocery: (ingredients: string[]) => void
+  onAddToGrocery: (ingredients: string[], recipeName?: string, recipeId?: string) => void
   onViewDetails: (recipeId: string) => void
 }
 
@@ -44,7 +44,7 @@ export function SavedRecipes({ recipes, onAddToGrocery, onViewDetails }: SavedRe
               key={recipe.id}
               recipe={recipe}
               onSaveAction={() => {}} // Already saved
-              onAddToGroceryAction={() => onAddToGrocery(recipe.ingredients)}
+              onAddToGroceryAction={() => onAddToGrocery(recipe.ingredients, recipe.title, recipe.id)}
               onViewDetailsAction={onViewDetails}
               isSaved={true}
             />
