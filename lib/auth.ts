@@ -1,8 +1,8 @@
-import type { NextAuthOptions } from "next-auth"
-import Google from "next-auth/providers/google"
-import Credentials from "next-auth/providers/credentials"
-import { compare } from "bcrypt"
-import clientPromise from "./mongodb"
+import type { NextAuthOptions } from "next-auth";
+import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import { compare } from "bcrypt";
+import clientPromise from "./mongodb";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,20 +16,22 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) { 
+      async authorize(credentials) {
         try {
-          const client = await clientPromise
-          const db = client.db("recipegen")
-          const user = await db.collection("users").findOne({ email: credentials?.email })
-          if (!user) return null
+          const client = await clientPromise;
+          const db = client.db("recipegen");
+          const user = await db
+            .collection("users")
+            .findOne({ email: credentials?.email });
+          if (!user) return null;
 
-          const isValid = await compare(credentials!.password, user.password)
-          if (!isValid) return null
+          const isValid = await compare(credentials!.password, user.password);
+          if (!isValid) return null;
 
-          return { id: user._id.toString(), email: user.email }
+          return { id: user._id.toString(), email: user.email };
         } catch (err) {
-          console.error("Authorize error:", err)
-          return null
+          console.error("Authorize error:", err);
+          return null;
         }
       },
     }),
@@ -41,4 +43,4 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
-}
+};
