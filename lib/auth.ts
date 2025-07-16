@@ -1,10 +1,9 @@
-import type { NextAuthOptions } from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 import clientPromise from "./mongodb";
 
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -25,7 +24,7 @@ export const authOptions: NextAuthOptions = {
             .findOne({ email: credentials?.email });
           if (!user) return null;
 
-          const isValid = await compare(credentials!.password, user.password);
+          const isValid = await compare(credentials!.password as string, user.password as string);
           if (!isValid) return null;
 
           return { id: user._id.toString(), email: user.email };
