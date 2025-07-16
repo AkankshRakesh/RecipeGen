@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState, useEffect } from "react"
 import { Plus, Search, ShoppingCart, BookOpen, ChefHat, Loader2, X, Lightbulb } from "lucide-react"
@@ -14,6 +14,18 @@ import { RecipeCard } from "@/components/recipe-card"
 import { GroceryList } from "@/components/grocery-list"
 import { SavedRecipes } from "@/components/saved-recipes"
 import { RecipeDetailModal } from "@/components/recipe-detail-modal"
+
+// Grocery list interfaces
+interface GroceryItem {
+  item: string
+  checked: boolean
+}
+
+interface GroceryListRecipe {
+  id: string
+  name: string
+  ingredients: GroceryItem[]
+}
 
 interface MealDBRecipe {
   idMeal: string
@@ -51,7 +63,7 @@ export default function RecipeGenerator() {
   const [currentIngredient, setCurrentIngredient] = useState("")
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
-  const [groceryItems, setGroceryItems] = useState<string[]>([])
+  const [groceryItems, setGroceryItems] = useState<GroceryListRecipe[]>([])
   const [loading, setLoading] = useState(false)
   const [searchPerformed, setSearchPerformed] = useState(false)
   const [invalidIngredients, setInvalidIngredients] = useState<string[]>([])
@@ -59,19 +71,39 @@ export default function RecipeGenerator() {
   const [ingredientSuggestions, setIngredientSuggestions] = useState<IngredientSuggestion[]>([])
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null)
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false)
+  
+  const loadRandomRecipes = React.useCallback(async () => {
+    setLoading(true)
+    try {
+      const randomRecipes = []
+      // Get 6 random recipes
+      for (let i = 0; i < 6; i++) {
+        const response = await fetch("https://www.themealdb.com/api/json/v1/1/random.php")
+        const data = await response.json()
+        if (data.meals && data.meals[0]) {
+          randomRecipes.push(transformMealDBRecipe(data.meals[0], []))
+        }
+      }
+      setRecipes(randomRecipes)
+    } catch (error) {
+      console.error("Error loading random recipes:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   // Load available ingredients and random recipes on initial load
   useEffect(() => {
     loadAvailableIngredients()
     loadRandomRecipes()
-  }, [])
+  }, [loadRandomRecipes])
 
   const loadAvailableIngredients = async () => {
     try {
       const response = await fetch("https://www.themealdb.com/api/json/v1/1/list.php?i=list")
       const data = await response.json()
       if (data.meals) {
-        const ingredientNames = data.meals.map((meal: any) => meal.strIngredient.toLowerCase())
+        const ingredientNames = data.meals.map((meal: MealDBRecipe) => (meal.strIngredient ?? "").toLowerCase())
         setAvailableIngredients(ingredientNames)
       }
     } catch (error) {
@@ -142,26 +174,6 @@ export default function RecipeGenerator() {
     return matrix[str2.length][str1.length]
   }
 
-  const loadRandomRecipes = async () => {
-    setLoading(true)
-    try {
-      const randomRecipes = []
-      // Get 6 random recipes
-      for (let i = 0; i < 6; i++) {
-        const response = await fetch("https://www.themealdb.com/api/json/v1/1/random.php")
-        const data = await response.json()
-        if (data.meals && data.meals[0]) {
-          randomRecipes.push(transformMealDBRecipe(data.meals[0], []))
-        }
-      }
-      setRecipes(randomRecipes)
-    } catch (error) {
-      console.error("Error loading random recipes:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const transformMealDBRecipe = (meal: MealDBRecipe, matchedIngredients: string[]): Recipe => {
     // Extract ingredients from the meal object
     const ingredients = []
@@ -195,7 +207,7 @@ export default function RecipeGenerator() {
     setIngredientSuggestions([])
 
     try {
-      const recipesByIngredient: { [key: string]: any[] } = {}
+      const recipesByIngredient: { [key: string]: MealDBRecipe[] } = {}
       const validIngredients: string[] = []
       const invalidIngs: string[] = []
       const suggestions: IngredientSuggestion[] = []
@@ -240,7 +252,7 @@ export default function RecipeGenerator() {
       }
 
       // Find common recipes across ingredients
-      let commonRecipes: any[] = []
+      let commonRecipes: MealDBRecipe[] = []
 
       if (validIngredients.length === 1) {
         // If only one valid ingredient, use all its recipes
@@ -248,19 +260,17 @@ export default function RecipeGenerator() {
       } else {
         // Find intersection of recipes
         const firstIngredient = validIngredients[0]
-        commonRecipes = recipesByIngredient[firstIngredient].filter((recipe: any) =>
+        commonRecipes = (recipesByIngredient[firstIngredient] as MealDBRecipe[]).filter((recipe: MealDBRecipe) =>
           validIngredients
             .slice(1)
-            .every((ingredient) => recipesByIngredient[ingredient].some((r: any) => r.idMeal === recipe.idMeal)),
+            .every((ingredient) => (recipesByIngredient[ingredient] as MealDBRecipe[]).some((r: MealDBRecipe) => r.idMeal === recipe.idMeal)),
         )
       }
 
-      // If no common recipes found, get recipes from each ingredient and merge
       if (commonRecipes.length === 0 && validIngredients.length > 1) {
         const allRecipes = validIngredients.flatMap((ingredient) => recipesByIngredient[ingredient])
         const recipeMap = new Map()
 
-        // Count how many ingredients each recipe matches
         allRecipes.forEach((recipe) => {
           if (recipeMap.has(recipe.idMeal)) {
             recipeMap.get(recipe.idMeal).count++
@@ -268,7 +278,7 @@ export default function RecipeGenerator() {
               .get(recipe.idMeal)
               .matchedIngredients.push(
                 ...validIngredients.filter((ing) =>
-                  recipesByIngredient[ing].some((r: any) => r.idMeal === recipe.idMeal),
+                  recipesByIngredient[ing].some((r: MealDBRecipe) => r.idMeal === recipe.idMeal),
                 ),
               )
           } else {
@@ -276,7 +286,7 @@ export default function RecipeGenerator() {
               recipe,
               count: 1,
               matchedIngredients: validIngredients.filter((ing) =>
-                recipesByIngredient[ing].some((r: any) => r.idMeal === recipe.idMeal),
+                recipesByIngredient[ing].some((r: MealDBRecipe) => r.idMeal === recipe.idMeal),
               ),
             })
           }
@@ -291,14 +301,14 @@ export default function RecipeGenerator() {
 
       // Get detailed information for each recipe
       const detailedRecipes = await Promise.all(
-        commonRecipes.slice(0, 9).map(async (meal: any) => {
+        commonRecipes.slice(0, 9).map(async (meal: MealDBRecipe) => {
           try {
             const detailResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`)
             const detailData = await detailResponse.json()
 
             // Find which ingredients this recipe matches
             const matchedIngredients = validIngredients.filter((ingredient) =>
-              recipesByIngredient[ingredient].some((r: any) => r.idMeal === meal.idMeal),
+              recipesByIngredient[ingredient].some((r: MealDBRecipe) => r.idMeal === meal.idMeal),
             )
 
             return transformMealDBRecipe(detailData.meals[0], matchedIngredients)
@@ -377,9 +387,75 @@ export default function RecipeGenerator() {
     }
   }
 
-  const addToGroceryList = (recipeIngredients: string[]) => {
-    const newItems = recipeIngredients.filter((item) => !groceryItems.includes(item))
-    setGroceryItems([...groceryItems, ...newItems])
+  const addToGroceryList = (recipeIngredients: string[], recipeName?: string, recipeId?: string) => {
+    setGroceryItems((prevItems) => {
+      const updatedItems = [...prevItems]
+      
+      // If we have recipe info, create a recipe-specific entry
+      if (recipeName && recipeId) {
+        const existingRecipeIndex = updatedItems.findIndex(item => item.id === recipeId)
+        
+        if (existingRecipeIndex === -1) {
+          // Create new recipe entry
+          const newRecipeEntry: GroceryListRecipe = {
+            id: recipeId,
+            name: recipeName,
+            ingredients: recipeIngredients.map(ingredient => ({
+              item: ingredient,
+              checked: false
+            }))
+          }
+          updatedItems.push(newRecipeEntry)
+        } else {
+          // Add to existing recipe entry, avoiding duplicates
+          const existingEntry = updatedItems[existingRecipeIndex]
+          const newIngredients = recipeIngredients
+            .filter(ingredient => !existingEntry.ingredients.some(existing => existing.item.toLowerCase() === ingredient.toLowerCase()))
+            .map(ingredient => ({
+              item: ingredient,
+              checked: false
+            }))
+          
+          updatedItems[existingRecipeIndex] = {
+            ...existingEntry,
+            ingredients: [...existingEntry.ingredients, ...newIngredients]
+          }
+        }
+      } else {
+        // Fallback: add to miscellaneous if no recipe info provided
+        const miscId = "miscellaneous-items"
+        const miscIndex = updatedItems.findIndex(item => item.id === miscId)
+        
+        if (miscIndex === -1) {
+          // Create miscellaneous entry
+          const miscEntry: GroceryListRecipe = {
+            id: miscId,
+            name: "Miscellaneous Items",
+            ingredients: recipeIngredients.map(ingredient => ({
+              item: ingredient,
+              checked: false
+            }))
+          }
+          updatedItems.push(miscEntry)
+        } else {
+          // Add to existing miscellaneous entry, avoiding duplicates
+          const existingEntry = updatedItems[miscIndex]
+          const newIngredients = recipeIngredients
+            .filter(ingredient => !existingEntry.ingredients.some(existing => existing.item.toLowerCase() === ingredient.toLowerCase()))
+            .map(ingredient => ({
+              item: ingredient,
+              checked: false
+            }))
+          
+          updatedItems[miscIndex] = {
+            ...existingEntry,
+            ingredients: [...existingEntry.ingredients, ...newIngredients]
+          }
+        }
+      }
+      
+      return updatedItems
+    })
   }
 
   const viewRecipeDetails = (recipeId: string) => {
@@ -490,7 +566,7 @@ export default function RecipeGenerator() {
                           <Lightbulb className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
                           <div className="flex-1">
                             <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                              "{suggestion.original}" not found. Did you mean:
+                              &quot;{suggestion.original}&quot; not found. Did you mean:
                             </p>
                             <div className="flex flex-wrap gap-2 mt-2">
                               {suggestion.suggestions.map((suggestedIngredient) => (
@@ -515,8 +591,8 @@ export default function RecipeGenerator() {
                 {invalidIngredients.length > 0 && ingredientSuggestions.length === 0 && (
                   <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
                     <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                      <strong>Note:</strong> Some ingredients couldn't be found in the database. Try using common
-                      ingredient names like "chicken", "beef", "tomato", etc.
+                      <strong>Note:</strong> Some ingredients couldn&apos;t be found in the database. Try using common
+                      ingredient names like &quot;chicken&quot;, &quot;onion&quot;, &quot;tomato&quot;, etc.
                     </p>
                   </div>
                 )}
@@ -550,7 +626,7 @@ export default function RecipeGenerator() {
                       key={recipe.id}
                       recipe={recipe}
                       onSaveAction={() => saveRecipe(recipe)}
-                      onAddToGroceryAction={() => addToGroceryList(recipe.ingredients)}
+                      onAddToGroceryAction={() => addToGroceryList(recipe.ingredients, recipe.title, recipe.id)}
                       onViewDetailsAction={viewRecipeDetails}
                       isSaved={savedRecipes.some((r) => r.id === recipe.id)}
                     />
@@ -577,7 +653,7 @@ export default function RecipeGenerator() {
           </TabsContent>
 
           <TabsContent value="grocery">
-            <GroceryList items={groceryItems} onUpdateItems={setGroceryItems} />
+            <GroceryList items={groceryItems} onUpdateItemsAction={setGroceryItems} />
           </TabsContent>
         </Tabs>
       </div>
