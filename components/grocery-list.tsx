@@ -1,76 +1,94 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Plus, Trash2, ShoppingCart, UtensilsCrossed, ChefHat } from "lucide-react" // Added UtensilsCrossed, ChefHat
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
+import type React from "react";
+import { useState } from "react";
+import {
+  Plus,
+  Trash2,
+  ShoppingCart,
+  UtensilsCrossed,
+  ChefHat,
+} from "lucide-react"; // Added UtensilsCrossed, ChefHat
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // New interfaces for grocery list
 interface GroceryItem {
-  item: string
-  checked: boolean
+  item: string;
+  checked: boolean;
 }
 
 interface GroceryListRecipe {
-  id: string // Recipe ID or a unique ID for miscellaneous
-  name: string // Recipe name or "Miscellaneous"
-  ingredients: GroceryItem[]
+  id: string; // Recipe ID or a unique ID for miscellaneous
+  name: string; // Recipe name or "Miscellaneous"
+  ingredients: GroceryItem[];
 }
 
 interface GroceryListProps {
-  items?: GroceryListRecipe[]
-  onUpdateItemsAction: (items: GroceryListRecipe[] | ((prevItems: GroceryListRecipe[]) => GroceryListRecipe[])) => void
+  items?: GroceryListRecipe[];
+  onUpdateItemsAction: (
+    items:
+      | GroceryListRecipe[]
+      | ((prevItems: GroceryListRecipe[]) => GroceryListRecipe[]),
+  ) => void;
 }
 
-const MISC_RECIPE_ID = "miscellaneous-items"
+const MISC_RECIPE_ID = "miscellaneous-items";
 
 export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
-  const [newItem, setNewItem] = useState("")
+  const [newItem, setNewItem] = useState("");
 
   // Guard against undefined items
-  const safeItems = items || []
+  const safeItems = items || [];
 
   // Helper to find the miscellaneous recipe entry
-  const getMiscRecipe = (currentItems: GroceryListRecipe[]) => currentItems.find((item) => item.id === MISC_RECIPE_ID)
+  const getMiscRecipe = (currentItems: GroceryListRecipe[]) =>
+    currentItems.find((item) => item.id === MISC_RECIPE_ID);
   const getMiscRecipeIndex = (currentItems: GroceryListRecipe[]) =>
-    currentItems.findIndex((item) => item.id === MISC_RECIPE_ID)
+    currentItems.findIndex((item) => item.id === MISC_RECIPE_ID);
 
   const addItem = () => {
     if (newItem.trim()) {
       onUpdateItemsAction((prevItems: GroceryListRecipe[]) => {
-        const updatedItems: GroceryListRecipe[] = [...prevItems]
-        let miscRecipe: GroceryListRecipe | undefined = getMiscRecipe(updatedItems)
-        let miscRecipeIndex: number = getMiscRecipeIndex(updatedItems)
+        const updatedItems: GroceryListRecipe[] = [...prevItems];
+        let miscRecipe: GroceryListRecipe | undefined =
+          getMiscRecipe(updatedItems);
+        let miscRecipeIndex: number = getMiscRecipeIndex(updatedItems);
 
         if (miscRecipeIndex === -1) {
           // Create miscellaneous category if it doesn't exist
           miscRecipe = {
-        id: MISC_RECIPE_ID,
-        name: "Miscellaneous Items",
-        ingredients: [],
-          }
-          updatedItems.push(miscRecipe)
-          miscRecipeIndex = updatedItems.length - 1
+            id: MISC_RECIPE_ID,
+            name: "Miscellaneous Items",
+            ingredients: [],
+          };
+          updatedItems.push(miscRecipe);
+          miscRecipeIndex = updatedItems.length - 1;
         }
 
         // Check if item already exists in miscellaneous
-        const existingItem: GroceryItem | undefined = updatedItems[miscRecipeIndex].ingredients.find(
-          (ing: GroceryItem) => ing.item.toLowerCase() === newItem.trim().toLowerCase(),
-        )
+        const existingItem: GroceryItem | undefined = updatedItems[
+          miscRecipeIndex
+        ].ingredients.find(
+          (ing: GroceryItem) =>
+            ing.item.toLowerCase() === newItem.trim().toLowerCase(),
+        );
         if (existingItem) {
-          setNewItem("") // Clear input even if duplicate
-          return prevItems // Don't add duplicate
+          setNewItem(""); // Clear input even if duplicate
+          return prevItems; // Don't add duplicate
         }
 
-        updatedItems[miscRecipeIndex].ingredients.push({ item: newItem.trim(), checked: false })
-        return updatedItems
-      })
-      setNewItem("")
+        updatedItems[miscRecipeIndex].ingredients.push({
+          item: newItem.trim(),
+          checked: false,
+        });
+        return updatedItems;
+      });
+      setNewItem("");
     }
-  }
+  };
 
   const removeItem = (recipeId: string, itemToRemove: string) => {
     onUpdateItemsAction((prevItems) => {
@@ -79,14 +97,16 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
           if (recipeEntry.id === recipeId) {
             return {
               ...recipeEntry,
-              ingredients: recipeEntry.ingredients.filter((ing) => ing.item !== itemToRemove),
-            }
+              ingredients: recipeEntry.ingredients.filter(
+                (ing) => ing.item !== itemToRemove,
+              ),
+            };
           }
-          return recipeEntry
+          return recipeEntry;
         })
-        .filter((recipeEntry) => recipeEntry.ingredients.length > 0) // Remove recipe entry if no ingredients left
-    })
-  }
+        .filter((recipeEntry) => recipeEntry.ingredients.length > 0); // Remove recipe entry if no ingredients left
+    });
+  };
 
   const toggleCheck = (recipeId: string, itemToToggle: string) => {
     onUpdateItemsAction((prevItems) => {
@@ -95,20 +115,22 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
           return {
             ...recipeEntry,
             ingredients: recipeEntry.ingredients.map((ing) =>
-              ing.item === itemToToggle ? { ...ing, checked: !ing.checked } : ing,
+              ing.item === itemToToggle
+                ? { ...ing, checked: !ing.checked }
+                : ing,
             ),
-          }
+          };
         }
-        return recipeEntry
-      })
-    })
-  }
+        return recipeEntry;
+      });
+    });
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      addItem()
+      addItem();
     }
-  }
+  };
 
   const clearCompleted = () => {
     onUpdateItemsAction((prevItems) => {
@@ -117,15 +139,20 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
           ...recipeEntry,
           ingredients: recipeEntry.ingredients.filter((ing) => !ing.checked),
         }))
-        .filter((recipeEntry) => recipeEntry.ingredients.length > 0) // Remove empty recipe entries
-    })
-  }
+        .filter((recipeEntry) => recipeEntry.ingredients.length > 0); // Remove empty recipe entries
+    });
+  };
 
-  const totalItems = safeItems.reduce((acc, recipeEntry) => acc + (recipeEntry?.ingredients?.length || 0), 0)
-  const completedItems = safeItems.reduce(
-    (acc, recipeEntry) => acc + (recipeEntry?.ingredients?.filter((ing) => ing?.checked).length || 0),
+  const totalItems = safeItems.reduce(
+    (acc, recipeEntry) => acc + (recipeEntry?.ingredients?.length || 0),
     0,
-  )
+  );
+  const completedItems = safeItems.reduce(
+    (acc, recipeEntry) =>
+      acc +
+      (recipeEntry?.ingredients?.filter((ing) => ing?.checked).length || 0),
+    0,
+  );
 
   return (
     <div className="space-y-6">
@@ -135,7 +162,9 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
             <ShoppingCart className="h-5 w-5 text-orange-500" />
             Grocery List
             {totalItems > 0 && (
-              <span className="text-sm font-normal text-gray-500">({totalItems - completedItems} remaining)</span>
+              <span className="text-sm font-normal text-gray-500">
+                ({totalItems - completedItems} remaining)
+              </span>
             )}
           </CardTitle>
         </CardHeader>
@@ -148,7 +177,10 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
               onKeyPress={handleKeyPress}
               className="flex-1"
             />
-            <Button onClick={addItem} className="bg-orange-500 hover:bg-orange-600">
+            <Button
+              onClick={addItem}
+              className="bg-orange-500 hover:bg-orange-600"
+            >
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -198,7 +230,12 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
                           : "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
                       }`}
                     >
-                      <Checkbox checked={item.checked} onCheckedChange={() => toggleCheck(recipeEntry.id, item.item)} />
+                      <Checkbox
+                        checked={item.checked}
+                        onCheckedChange={() =>
+                          toggleCheck(recipeEntry.id, item.item)
+                        }
+                      />
                       <span
                         className={`flex-1 capitalize ${
                           item.checked
@@ -228,11 +265,12 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
           <CardContent className="p-8 text-center">
             <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400">
-              Your grocery list is empty. Add ingredients from recipes or manually add items above.
+              Your grocery list is empty. Add ingredients from recipes or
+              manually add items above.
             </p>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }
