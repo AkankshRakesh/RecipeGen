@@ -16,6 +16,7 @@ import Link from "next/link"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet" // New import for mobile menu
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu" // New imports for user dropdown
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar" // New imports for user avatar
+import { useRouter, useSearchParams } from "next/navigation"
 
 // Grocery list interfaces
 interface GroceryItem {
@@ -72,12 +73,23 @@ export default function RecipeGenerator() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedTab, setSelectedTab] = useState("generator") // New state for controlling tabs
   const [isSheetOpen, setIsSheetOpen] = useState(false) // New state for mobile sheet
-
+  const searchParams = useSearchParams()
+  const router = useRouter()
   useEffect(() => {
     // Simulate checking login status (replace with real check)
     const token = localStorage.getItem("authToken")
     setIsAuthenticated(!!token)
   }, [])
+  useEffect(() => {
+  const token = searchParams.get("token");
+  if (token) {
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("name", searchParams.get("name") || "User");
+    localStorage.setItem("picture", searchParams.get("picture") || "/placeholder-user.jpg");
+    setIsAuthenticated(true); // update state
+    router.replace("/"); // remove token from URL
+  }
+}, [searchParams, router]);
 
   const handleLogout = () => {
     localStorage.removeItem("authToken")
@@ -489,14 +501,16 @@ export default function RecipeGenerator() {
             </Link>
 
             {/* Desktop Navigation & Auth/Theme */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-4">
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full" aria-label="User menu">
                       <Avatar className="h-9 w-9">
-                        <AvatarImage src="/placeholder-user.jpg" alt="User Avatar" />
-                        <AvatarFallback>CN</AvatarFallback>
+                        <AvatarImage src={localStorage.getItem("picture") || "/placeholder-user.jpg"} alt="User Avatar" />
+                        <AvatarFallback>
+                          {(localStorage.getItem("name") || "User").charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
@@ -514,74 +528,6 @@ export default function RecipeGenerator() {
               <ThemeToggle />
             </div>
 
-            {/* Mobile Menu Trigger */}
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon" aria-label="Open menu">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Toggle Menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[250px] sm:w-[300px]">
-                <nav className="flex flex-col gap-4 py-6">
-                  <Link
-                    href="#"
-                    onClick={() => {
-                      setSelectedTab("generator")
-                      setIsSheetOpen(false)
-                    }}
-                    className="flex items-center gap-2 text-lg font-semibold text-gray-700 hover:text-orange-500 dark:text-gray-300 dark:hover:text-orange-400 transition-colors"
-                  >
-                    <Search className="h-5 w-5" />
-                    Generator
-                  </Link>
-                  <Link
-                    href="#"
-                    onClick={() => {
-                      setSelectedTab("saved")
-                      setIsSheetOpen(false)
-                    }}
-                    className="flex items-center gap-2 text-lg font-semibold text-gray-700 hover:text-orange-500 dark:text-gray-300 dark:hover:text-orange-400 transition-colors"
-                  >
-                    <BookOpen className="h-5 w-5" />
-                    Saved
-                  </Link>
-                  <Link
-                    href="#"
-                    onClick={() => {
-                      setSelectedTab("grocery")
-                      setIsSheetOpen(false)
-                    }}
-                    className="flex items-center gap-2 text-lg font-semibold text-gray-700 hover:text-orange-500 dark:text-gray-300 dark:hover:text-orange-400 transition-colors"
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    Grocery List
-                  </Link>
-                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <ThemeToggle />
-                  </div>
-                  {isAuthenticated ? (
-                    <Button
-                      variant="outline"
-                      className="w-full mt-4 bg-red-500 hover:bg-red-600 text-white"
-                      onClick={handleLogout}
-                    >
-                      Logout
-                    </Button>
-                  ) : (
-                    <Link href="/login" className="w-full mt-4">
-                      <Button
-                        variant="outline"
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                        onClick={() => setIsSheetOpen(false)} // Close sheet on login click
-                      >
-                        Login
-                      </Button>
-                    </Link>
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       </header>
