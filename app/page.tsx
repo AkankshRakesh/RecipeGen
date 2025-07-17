@@ -141,6 +141,8 @@ export default function RecipeGenerator() {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("name");
+    localStorage.removeItem("picture");
     setIsAuthenticated(false);
     setSavedRecipes([]);
   };
