@@ -23,23 +23,30 @@ export async function POST(req: Request) {
 
     const user = await db.collection("users").findOne({ email });
     if (!user) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        { status: 401 },
+      );
     }
 
     const isMatch = await compare(password, user.password);
     if (!isMatch) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        { status: 401 },
+      );
     }
 
-    const token = signJwt(
-      {
-        userId: user._id,
-        email: user.email,
-      }
-    );
+    const token = signJwt({
+      userId: user._id,
+      email: user.email,
+    });
 
     return NextResponse.json({ token });
   } catch {
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 },
+    );
   }
 }
