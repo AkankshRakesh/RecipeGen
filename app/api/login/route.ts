@@ -3,7 +3,7 @@ import clientPromise from "@/lib/mongodb";
 import { compare } from "bcrypt";
 import { signJwt } from "@/lib/jwt";
 export async function GET() {
-  const redirectUri = "http://localhost:3000/api/login/google/callback";
+  const redirectUri = `${process.env.SITE}/api/login/google/callback`;
   const clientId = process.env.GOOGLE_CLIENT_ID!;
   const scope = [
     "https://www.googleapis.com/auth/userinfo.profile",
