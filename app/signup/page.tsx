@@ -1,52 +1,52 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, Chrome, ArrowLeft, Eye, EyeOff } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
-
-// Simple Google OAuth sign-in handler
-function oauthSignIn(provider: string) {
-  // Redirect to your OAuth endpoint (adjust the URL as needed)
-  window.location.href = `/api/auth/${provider}`
-}
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Loader2, Chrome, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export default function SignupPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false) // New state for password visibility
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
       const res = await fetch("/api/signup", {
         method: "POST",
         body: JSON.stringify({ email, password }),
         headers: { "Content-Type": "application/json" },
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (res.ok) {
-        router.push("/login")
+        router.push("/login");
       } else {
-        setError(data.message || "Signup failed")
+        setError(data.message || "Signup failed");
       }
-    } catch (err) {
-      setError("An unexpected error occurred")
+    } catch {
+      setError("An unexpected error occurred");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -63,7 +63,9 @@ export default function SignupPage() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <CardHeader className="text-center pt-8">
-          <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">Sign Up</CardTitle>
+          <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">
+            Sign Up
+          </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-400">
             Create an account to get started
           </CardDescription>
@@ -114,12 +116,19 @@ export default function SignupPage() {
             </div>
 
             {error && (
-              <p className="text-sm text-red-500 dark:text-red-400" role="alert">
+              <p
+                className="text-sm text-red-500 dark:text-red-400"
+                role="alert"
+              >
                 {error}
               </p>
             )}
 
-            <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -148,12 +157,15 @@ export default function SignupPage() {
 
           <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-orange-600 hover:underline dark:text-orange-400">
+            <Link
+              href="/login"
+              className="font-medium text-orange-600 hover:underline dark:text-orange-400"
+            >
               Login
             </Link>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

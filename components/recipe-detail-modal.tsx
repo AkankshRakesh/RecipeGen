@@ -135,8 +135,11 @@ export function RecipeDetailModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onCloseAction} >
-      <DialogContent showCloseButton={false} className="max-w-5xl max-h-[95vh] p-0 gap-0 overflow-hidden">
+    <Dialog open={isOpen} onOpenChange={onCloseAction}>
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-5xl max-h-[95vh] p-0 gap-0 overflow-hidden"
+      >
         <DialogTitle className="sr-only">
           {recipe?.strMeal || "Recipe Details"}
         </DialogTitle>
@@ -221,81 +224,81 @@ export function RecipeDetailModal({
             {/* Content */}
             <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-200 dark:scrollbar-thumb-orange-800 scrollbar-track-transparent">
               <div className="p-6 space-y-8">
-              {/* Quick Actions */}
-              {(recipe.strYoutube || recipe.strSource) && (
-                <div className="flex gap-3">
-                {recipe.strYoutube && (
-                  <Button
-                  variant="outline"
-                  onClick={() => window.open(recipe.strYoutube, "_blank")}
-                  className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-950 dark:border-red-800 dark:text-red-300"
-                  >
-                  <Youtube className="h-4 w-4 mr-2" />
-                  Watch Video
-                  </Button>
-                )}
-                {recipe.strSource && (
-                  <Button
-                  variant="outline"
-                  onClick={() => window.open(recipe.strSource, "_blank")}
-                  className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300"
-                  >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Original Recipe
-                  </Button>
-                )}
-                </div>
-              )}
-
-              {/* Ingredients Section */}
-              <div>
-                <div className="flex items-center gap-2 mb-6">
-                <ChefHat className="h-6 w-6 text-orange-500" />
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Ingredients
-                </h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {getIngredientsWithMeasurements(recipe).map(
-                  (item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-xl border border-orange-100 dark:border-orange-900/30"
-                  >
-                    <span className="font-medium text-gray-900 dark:text-white capitalize flex-1">
-                    {item.ingredient}
-                    </span>
-                    <Badge
-                    variant="secondary"
-                    className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 ml-3"
-                    >
-                    {item.measure || "To taste"}
-                    </Badge>
+                {/* Quick Actions */}
+                {(recipe.strYoutube || recipe.strSource) && (
+                  <div className="flex gap-3">
+                    {recipe.strYoutube && (
+                      <Button
+                        variant="outline"
+                        onClick={() => window.open(recipe.strYoutube, "_blank")}
+                        className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-950 dark:border-red-800 dark:text-red-300"
+                      >
+                        <Youtube className="h-4 w-4 mr-2" />
+                        Watch Video
+                      </Button>
+                    )}
+                    {recipe.strSource && (
+                      <Button
+                        variant="outline"
+                        onClick={() => window.open(recipe.strSource, "_blank")}
+                        className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300"
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Original Recipe
+                      </Button>
+                    )}
                   </div>
-                  ),
                 )}
-                </div>
-              </div>
 
-              <Separator className="my-8" />
+                {/* Ingredients Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <ChefHat className="h-6 w-6 text-orange-500" />
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      Ingredients
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {getIngredientsWithMeasurements(recipe).map(
+                      (item, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-xl border border-orange-100 dark:border-orange-900/30"
+                        >
+                          <span className="font-medium text-gray-900 dark:text-white capitalize flex-1">
+                            {item.ingredient}
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 ml-3"
+                          >
+                            {item.measure || "To taste"}
+                          </Badge>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
 
-              {/* Instructions Section */}
-              <div>
-                <div className="flex items-center gap-2 mb-6">
-                <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">📝</span>
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Instructions
-                </h2>
-                </div>
-                <div className="space-y-4">
-                {formatInstructions(recipe.strInstructions)}
-                </div>
-              </div>
+                <Separator className="my-8" />
 
-              {/* Bottom Spacing */}
-              <div className="h-4" />
+                {/* Instructions Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">📝</span>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      Instructions
+                    </h2>
+                  </div>
+                  <div className="space-y-4">
+                    {formatInstructions(recipe.strInstructions)}
+                  </div>
+                </div>
+
+                {/* Bottom Spacing */}
+                <div className="h-4" />
               </div>
             </div>
           </div>
