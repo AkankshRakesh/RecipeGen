@@ -13,9 +13,9 @@ import { GroceryList } from "@/components/grocery-list"
 import { SavedRecipes } from "@/components/saved-recipes"
 import { RecipeDetailModal } from "@/components/recipe-detail-modal"
 import Link from "next/link"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet" // New import for mobile menu
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu" // New imports for user dropdown
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar" // New imports for user avatar
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter, useSearchParams } from "next/navigation"
 
 // Grocery list interfaces
@@ -71,38 +71,66 @@ export default function RecipeGenerator() {
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null)
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [selectedTab, setSelectedTab] = useState("generator") // New state for controlling tabs
-  const [isSheetOpen, setIsSheetOpen] = useState(false) // New state for mobile sheet
+  const [selectedTab, setSelectedTab] = useState("generator")
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const searchParams = useSearchParams()
   const router = useRouter()
+
+  // Fetch saved recipes when authentication status changes
+  const fetchSavedRecipes = async () => {
+    const token = localStorage.getItem("authToken")
+    if (!token) return
+
+    try {
+      const response = await fetch("/api/save", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSavedRecipes(data.savedRecipes || [])
+      }
+    } catch (error) {
+      console.error("Error fetching saved recipes:", error)
+    }
+  }
+
   useEffect(() => {
-    // Simulate checking login status (replace with real check)
     const token = localStorage.getItem("authToken")
     setIsAuthenticated(!!token)
+    if (token) {
+      fetchSavedRecipes()
+    } else {
+      setSavedRecipes([])
+    }
   }, [])
+
   useEffect(() => {
-  const token = searchParams.get("token");
-  if (token) {
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("name", searchParams.get("name") || "User");
-    localStorage.setItem("picture", searchParams.get("picture") || "/placeholder-user.jpg");
-    setIsAuthenticated(true); // update state
-    router.replace("/"); // remove token from URL
-  }
-}, [searchParams, router]);
+    const token = searchParams.get("token")
+    if (token) {
+      localStorage.setItem("authToken", token)
+      localStorage.setItem("name", searchParams.get("name") || "User")
+      localStorage.setItem("picture", searchParams.get("picture") || "/placeholder-user.jpg")
+      setIsAuthenticated(true)
+      fetchSavedRecipes()
+      router.replace("/")
+    }
+  }, [searchParams, router])
 
   const handleLogout = () => {
     localStorage.removeItem("authToken")
     setIsAuthenticated(false)
-    window.location.reload()
-    setIsSheetOpen(false) // Close sheet on logout
+    setSavedRecipes([])
+    setIsSheetOpen(false)
   }
 
   const loadRandomRecipes = React.useCallback(async () => {
     setLoading(true)
     try {
       const randomRecipes = []
-      // Get 6 random recipes
       for (let i = 0; i < 6; i++) {
         const response = await fetch("https://www.themealdb.com/api/json/v1/1/random.php")
         const data = await response.json()
@@ -118,7 +146,6 @@ export default function RecipeGenerator() {
     }
   }, [])
 
-  // Load available ingredients and random recipes on initial load
   useEffect(() => {
     loadAvailableIngredients()
     loadRandomRecipes()
@@ -137,67 +164,7 @@ export default function RecipeGenerator() {
     }
   }
 
-  const findSimilarIngredients = (searchTerm: string, availableList: string[]): string[] => {
-    const term = searchTerm.toLowerCase()
-    const suggestions: { ingredient: string; score: number }[] = []
-    availableList.forEach((ingredient) => {
-      const ingredientLower = ingredient.toLowerCase()
-      let score = 0
-      // Exact match
-      if (ingredientLower === term) {
-        score = 100
-      }
-      // Starts with
-      else if (ingredientLower.startsWith(term)) {
-        score = 90
-      }
-      // Contains the term
-      else if (ingredientLower.includes(term)) {
-        score = 80
-      }
-      // Term contains the ingredient
-      else if (term.includes(ingredientLower)) {
-        score = 70
-      }
-      // Levenshtein distance for similar words
-      else {
-        const distance = levenshteinDistance(term, ingredientLower)
-        if (distance <= 2 && Math.min(term.length, ingredientLower.length) > 3) {
-          score = 60 - distance * 10
-        }
-      }
-      if (score > 0) {
-        suggestions.push({ ingredient, score })
-      }
-    })
-    return suggestions
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5)
-      .map((s) => s.ingredient)
-  }
-
-  const levenshteinDistance = (str1: string, str2: string): number => {
-    const matrix = []
-    for (let i = 0; i <= str2.length; i++) {
-      matrix[i] = [i]
-    }
-    for (let j = 0; j <= str1.length; j++) {
-      matrix[0][j] = j
-    }
-    for (let i = 1; i <= str2.length; i++) {
-      for (let j = 1; j <= str1.length; j++) {
-        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1]
-        } else {
-          matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
-        }
-      }
-    }
-    return matrix[str2.length][str1.length]
-  }
-
   const transformMealDBRecipe = (meal: MealDBRecipe, matchedIngredients: string[]): Recipe => {
-    // Extract ingredients from the meal object
     const ingredients = []
     for (let i = 1; i <= 20; i++) {
       const ingredient = meal[`strIngredient${i}`]
@@ -209,9 +176,9 @@ export default function RecipeGenerator() {
       id: meal.idMeal,
       title: meal.strMeal,
       image: meal.strMealThumb,
-      cookTime: "30 mins", // API doesn't provide cook time
-      servings: 4, // API doesn't provide servings
-      rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // Random rating between 3-5
+      cookTime: "30 mins",
+      servings: 4,
+      rating: Math.round((Math.random() * 2 + 3) * 10) / 10,
       ingredients,
       difficulty: ["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)],
       description: meal.strInstructions.slice(0, 120) + "...",
@@ -232,7 +199,6 @@ export default function RecipeGenerator() {
       const invalidIngs: string[] = []
       const suggestions: IngredientSuggestion[] = []
 
-      // Search for each ingredient individually
       for (const ingredient of ingredientList) {
         try {
           const response = await fetch(
@@ -244,7 +210,6 @@ export default function RecipeGenerator() {
             validIngredients.push(ingredient)
           } else {
             invalidIngs.push(ingredient)
-            // Find similar ingredients
             if (availableIngredients.length > 0) {
               const similarIngredients = findSimilarIngredients(ingredient, availableIngredients)
               if (similarIngredients.length > 0) {
@@ -270,13 +235,10 @@ export default function RecipeGenerator() {
         return
       }
 
-      // Find common recipes across ingredients
       let commonRecipes: MealDBRecipe[] = []
       if (validIngredients.length === 1) {
-        // If only one valid ingredient, use all its recipes
         commonRecipes = recipesByIngredient[validIngredients[0]]
       } else {
-        // Find intersection of recipes
         const firstIngredient = validIngredients[0]
         commonRecipes = (recipesByIngredient[firstIngredient] as MealDBRecipe[]).filter((recipe: MealDBRecipe) =>
           validIngredients
@@ -310,20 +272,17 @@ export default function RecipeGenerator() {
             })
           }
         })
-        // Sort by number of matched ingredients (descending)
         commonRecipes = Array.from(recipeMap.values())
           .sort((a, b) => b.count - a.count)
           .slice(0, 12)
           .map((item) => item.recipe)
       }
 
-      // Get detailed information for each recipe
       const detailedRecipes = await Promise.all(
         commonRecipes.slice(0, 9).map(async (meal: MealDBRecipe) => {
           try {
             const detailResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`)
             const detailData = await detailResponse.json()
-            // Find which ingredients this recipe matches
             const matchedIngredients = validIngredients.filter((ingredient) =>
               recipesByIngredient[ingredient].some((r: MealDBRecipe) => r.idMeal === meal.idMeal),
             )
@@ -336,10 +295,7 @@ export default function RecipeGenerator() {
       )
 
       const validRecipes = detailedRecipes.filter((recipe) => recipe !== null) as Recipe[]
-
-      // Sort by number of matched ingredients
       validRecipes.sort((a, b) => b.matchedIngredients.length - a.matchedIngredients.length)
-
       setRecipes(validRecipes)
       setSearchPerformed(true)
     } catch (error) {
@@ -347,6 +303,36 @@ export default function RecipeGenerator() {
       setRecipes([])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSaveRecipe = async (recipe: Recipe) => {
+    const token = localStorage.getItem("authToken")
+    if (!token) return alert("Please log in first.")
+
+    const isAlreadySaved = savedRecipes.some(r => r.id === recipe.id)
+
+    try {
+      const res = await fetch("/api/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ recipe }),
+      })
+
+      if (res.ok) {
+        if (isAlreadySaved) {
+          setSavedRecipes(prev => prev.filter(r => r.id !== recipe.id))
+        } else {
+          setSavedRecipes(prev => [...prev, recipe])
+        }
+      } else {
+        console.error("Failed to save recipe")
+      }
+    } catch (error) {
+      console.error("Error saving recipe:", error)
     }
   }
 
@@ -487,7 +473,6 @@ export default function RecipeGenerator() {
       <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo and Title - now clickable */}
             <Link
               href="#"
               onClick={() => setSelectedTab("generator")}
@@ -500,7 +485,6 @@ export default function RecipeGenerator() {
               </h1>
             </Link>
 
-            {/* Desktop Navigation & Auth/Theme */}
             <div className="flex items-center gap-4">
               {isAuthenticated ? (
                 <DropdownMenu>
@@ -527,10 +511,10 @@ export default function RecipeGenerator() {
               )}
               <ThemeToggle />
             </div>
-
           </div>
         </div>
       </header>
+
       <div className="container mx-auto px-4 py-8">
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
@@ -547,8 +531,8 @@ export default function RecipeGenerator() {
               Grocery List
             </TabsTrigger>
           </TabsList>
+
           <TabsContent value="generator" className="space-y-6">
-            {/* Ingredient Input Section */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -559,7 +543,7 @@ export default function RecipeGenerator() {
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Enter an ingredient (e.g., chicken, tomatoes, pasta)"
+                    placeholder="Enter an ingredient (e.g., chicken, tomatoes, rice)"
                     value={currentIngredient}
                     onChange={(e) => setCurrentIngredient(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -597,7 +581,6 @@ export default function RecipeGenerator() {
                     </div>
                   </div>
                 )}
-                {/* Ingredient Suggestions */}
                 {ingredientSuggestions.length > 0 && (
                   <div className="space-y-3">
                     {ingredientSuggestions.map((suggestion) => (
@@ -640,7 +623,7 @@ export default function RecipeGenerator() {
                 )}
               </CardContent>
             </Card>
-            {/* Recipe Results */}
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -665,10 +648,10 @@ export default function RecipeGenerator() {
                     <RecipeCard
                       key={recipe.id}
                       recipe={recipe}
-                      onSaveAction={() => saveRecipe(recipe)}
+                      onSaveAction={() => handleSaveRecipe(recipe)}
                       onAddToGroceryAction={() => addToGroceryList(recipe.ingredients, recipe.title, recipe.id)}
                       onViewDetailsAction={viewRecipeDetails}
-                      isSaved={savedRecipes.some((r) => r.id === recipe.id)}
+                      isSaved={savedRecipes.some(r => r.id === recipe.id)}
                     />
                   ))}
                 </div>
@@ -687,14 +670,22 @@ export default function RecipeGenerator() {
               ) : null}
             </div>
           </TabsContent>
+
           <TabsContent value="saved">
-            <SavedRecipes recipes={savedRecipes} onAddToGrocery={addToGroceryList} onViewDetails={viewRecipeDetails} />
+            <SavedRecipes 
+              recipes={savedRecipes} 
+              onAddToGrocery={addToGroceryList} 
+              onViewDetails={viewRecipeDetails}
+              // onUnsaveRecipe={handleSaveRecipe}
+            />
           </TabsContent>
+
           <TabsContent value="grocery">
             <GroceryList items={groceryItems} onUpdateItemsAction={setGroceryItems} />
           </TabsContent>
         </Tabs>
       </div>
+
       <RecipeDetailModal recipeId={selectedRecipeId} isOpen={isRecipeModalOpen} onCloseAction={closeRecipeModal} />
     </div>
   )
