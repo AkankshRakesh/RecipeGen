@@ -1,26 +1,20 @@
-import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import { NextRequest, NextResponse } from "next/server";
+import { hash } from "bcrypt";
 import clientPromise from "@/lib/mongodb";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
+
   const client = await clientPromise;
   const db = client.db("recipegen");
 
-  const existingUser = await db.collection("users").findOne({ email });
-  if (existingUser) {
-    return NextResponse.json(
-      { message: "User already exists" },
-      { status: 400 },
-    );
+  const existing = await db.collection("users").findOne({ email });
+  if (existing) {
+    return NextResponse.json({ message: "User already exists" }, { status: 400 });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashed = await hash(password, 10);
+  const result = await db.collection("users").insertOne({ email, password: hashed });
 
-  await db.collection("users").insertOne({
-    email,
-    password: hashedPassword,
-  });
-
-  return NextResponse.json({ message: "User created" });
+  return NextResponse.json({ message: "User registered", userId: result.insertedId }, { status: 201 });
 }
