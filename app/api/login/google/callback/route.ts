@@ -49,6 +49,6 @@ export async function GET(req: Request) {
 
   // Redirect to frontend with token, name, and picture
   return NextResponse.redirect(
-    `http://localhost:3000/?token=${token}&name=${name}&picture=${picture}`,
+    `${process.env.SITE}/?token=${token}&name=${name}&picture=${picture}`,
   );
 }
