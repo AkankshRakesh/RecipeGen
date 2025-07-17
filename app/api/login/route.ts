@@ -12,4 +12,3 @@ export async function GET() {
 
   return NextResponse.redirect(authUrl);
 }
-

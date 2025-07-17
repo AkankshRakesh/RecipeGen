@@ -10,11 +10,19 @@ export async function POST(req: NextRequest) {
 
   const existing = await db.collection("users").findOne({ email });
   if (existing) {
-    return NextResponse.json({ message: "User already exists" }, { status: 400 });
+    return NextResponse.json(
+      { message: "User already exists" },
+      { status: 400 },
+    );
   }
 
   const hashed = await hash(password, 10);
-  const result = await db.collection("users").insertOne({ email, password: hashed });
+  const result = await db
+    .collection("users")
+    .insertOne({ email, password: hashed });
 
-  return NextResponse.json({ message: "User registered", userId: result.insertedId }, { status: 201 });
+  return NextResponse.json(
+    { message: "User registered", userId: result.insertedId },
+    { status: 201 },
+  );
 }

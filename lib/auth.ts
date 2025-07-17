@@ -24,7 +24,10 @@ export const authOptions = {
             .findOne({ email: credentials?.email });
           if (!user) return null;
 
-          const isValid = await compare(credentials!.password as string, user.password as string);
+          const isValid = await compare(
+            credentials!.password as string,
+            user.password as string,
+          );
           if (!isValid) return null;
 
           return { id: user._id.toString(), email: user.email };

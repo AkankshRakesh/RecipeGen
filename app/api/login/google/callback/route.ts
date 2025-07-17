@@ -45,9 +45,10 @@ export async function GET(req: Request) {
 
   const token = signJwt({ email: userData.email });
   const name = encodeURIComponent(userData.name);
-const picture = encodeURIComponent(userData.picture);
+  const picture = encodeURIComponent(userData.picture);
 
-// Redirect to frontend with token, name, and picture
-return NextResponse.redirect(`http://localhost:3000/?token=${token}&name=${name}&picture=${picture}`);
-
+  // Redirect to frontend with token, name, and picture
+  return NextResponse.redirect(
+    `http://localhost:3000/?token=${token}&name=${name}&picture=${picture}`,
+  );
 }
