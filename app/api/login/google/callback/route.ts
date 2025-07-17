@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   const code = url.searchParams.get("code");
   if (!code) return NextResponse.json({ error: "No code" }, { status: 400 });
 
-  const redirectUri = "http://localhost:3000/api/login/google/callback";
+  const redirectUri = `${process.env.SITE}/api/login/google/callback`;
 
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
