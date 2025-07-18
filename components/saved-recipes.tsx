@@ -26,11 +26,13 @@ interface SavedRecipesProps {
     recipeId?: string,
   ) => void;
   onViewDetails: (recipeId: string) => void;
+  onSaveRecipe: (recipe: Recipe, addNewSaved: boolean) => void; // Add this line
 }
 
 export function SavedRecipes({
   recipes,
   onAddToGrocery,
+  onSaveRecipe,
   onViewDetails,
 }: SavedRecipesProps) {
   return (
@@ -53,7 +55,7 @@ export function SavedRecipes({
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
-              onSaveAction={() => {}} // Already saved
+              onSaveAction={() => {onSaveRecipe(recipe, false)}} // Already saved
               onAddToGroceryAction={() =>
                 onAddToGrocery(recipe.ingredients, recipe.title, recipe.id)
               }

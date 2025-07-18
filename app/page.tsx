@@ -435,7 +435,7 @@ export default function RecipeGenerator() {
     }
   };
 
-  const handleSaveRecipe = async (recipe: Recipe) => {
+  const handleSaveRecipe = async (recipe: Recipe, addNewSaved: boolean) => {
     const token = localStorage.getItem("authToken");
     if (!token) return alert("Please log in first.");
 
@@ -448,7 +448,7 @@ export default function RecipeGenerator() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ recipe }),
+        body: JSON.stringify({ recipe, addNewSaved: addNewSaved }),
       });
 
       if (res.ok) {
@@ -844,7 +844,7 @@ export default function RecipeGenerator() {
                     <RecipeCard
                       key={recipe.id}
                       recipe={recipe}
-                      onSaveAction={() => handleSaveRecipe(recipe)}
+                      onSaveAction={() => handleSaveRecipe(recipe, true)}
                       onAddToGroceryAction={() =>
                         addToGroceryList(
                           recipe.ingredients,
@@ -880,7 +880,7 @@ export default function RecipeGenerator() {
               recipes={savedRecipes}
               onAddToGrocery={addToGroceryList}
               onViewDetails={viewRecipeDetails}
-              // onUnsaveRecipe={handleSaveRecipe}
+              onSaveRecipe={handleSaveRecipe}
             />
           </TabsContent>
 
