@@ -190,32 +190,22 @@ export function RecipeDetailModal({
 
               {/* Recipe Title Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                  {recipe.strMeal}
+                </h1>
+                <div className="flex items-center gap-2 text-white/90">
+                  <div className="flex items-center gap-1">
+                    <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
                     {recipe.strCategory}
                   </Badge>
-                  <Badge
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Badge
                     variant="outline"
                     className="bg-white/20 border-white/30 text-white"
                   >
                     {recipe.strArea}
                   </Badge>
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                  {recipe.strMeal}
-                </h1>
-                <div className="flex items-center gap-6 text-white/90">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">30 mins</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span className="text-sm">4 servings</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm">4.5</span>
                   </div>
                 </div>
               </div>

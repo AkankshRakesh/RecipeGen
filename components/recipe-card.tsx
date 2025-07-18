@@ -78,21 +78,14 @@ export function RecipeCard({
         <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
           {recipe.description}
         </p>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <MapPin className="h-3 w-3" />
-          <span>{recipe.area}</span>
-        </div>
+        
       </CardHeader>
 
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            {recipe.cookTime}
-          </div>
-          <div className="flex items-center gap-1">
-            <Users className="h-4 w-4" />
-            {recipe.servings} servings
+            <MapPin className="h-3 w-3" />
+          <span>{recipe.area}</span>
           </div>
           <div className="flex items-center gap-1">
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
