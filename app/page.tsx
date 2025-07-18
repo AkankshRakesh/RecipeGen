@@ -1,25 +1,9 @@
 "use client";
 import React from "react";
 import { useState, useEffect } from "react";
-import {
-  Plus,
-  Search,
-  ShoppingCart,
-  BookOpen,
-  ChefHat,
-  Loader2,
-  X,
-  Lightbulb,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { BookOpen, ChefHat, Search, ShoppingCart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { RecipeCard } from "@/components/recipe-card";
-import { GroceryList } from "@/components/grocery-list";
-import { SavedRecipes } from "@/components/saved-recipes";
 import { RecipeDetailModal } from "@/components/recipe-detail-modal";
 import Link from "next/link";
 import {
@@ -30,47 +14,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter, useSearchParams } from "next/navigation";
-
-// Grocery list interfaces
-interface GroceryItem {
-  item: string;
-  checked: boolean;
-}
-interface GroceryListRecipe {
-  id: string;
-  name: string;
-  ingredients: GroceryItem[];
-}
-interface MealDBRecipe {
-  idMeal: string;
-  strMeal: string;
-  strMealThumb: string;
-  strCategory: string;
-  strArea: string;
-  strInstructions: string;
-  [key: string]: string | null;
-}
-interface Recipe {
-  id: string;
-  title: string;
-  image: string;
-  cookTime: string;
-  servings: number;
-  rating: number;
-  ingredients: string[];
-  difficulty: string;
-  description: string;
-  instructions: string;
-  category: string;
-  area: string;
-  matchedIngredients: string[];
-}
-interface IngredientSuggestion {
-  original: string;
-  suggestions: string[];
-}
+import { GeneratorTab } from "@/components/GeneratorTab";
+import { SavedRecipesTab } from "@/components/SavedRecipes";
+import { GroceryListTab } from "@/components/GroceryList";
+import {
+  GroceryListRecipe,
+  IngredientSuggestion,
+  MealDBRecipe,
+} from "@/lib/types";
+import { Recipe } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 
 export default function RecipeGenerator() {
+  // State declarations (same as before)
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [currentIngredient, setCurrentIngredient] = useState("");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -79,9 +35,7 @@ export default function RecipeGenerator() {
   const [loading, setLoading] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [invalidIngredients, setInvalidIngredients] = useState<string[]>([]);
-  const [availableIngredients, setAvailableIngredients] = useState<string[]>(
-    [],
-  );
+  const [availableIngredients, setAvailableIngredients] = useState<string[]>([]);
   const [ingredientSuggestions, setIngredientSuggestions] = useState<
     IngredientSuggestion[]
   >([]);
@@ -114,13 +68,37 @@ export default function RecipeGenerator() {
     }
   };
 
+  // Fetch grocery list when authentication status changes
+  const fetchGroceryList = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    try {
+      const response = await fetch("/api/groceryList", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGroceryItems(data.groceryList || []);
+      }
+    } catch (error) {
+      console.error("Error fetching grocery list:", error);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     setIsAuthenticated(!!token);
     if (token) {
       fetchSavedRecipes();
+      fetchGroceryList();
     } else {
       setSavedRecipes([]);
+      setGroceryItems([]);
     }
   }, []);
 
@@ -135,6 +113,7 @@ export default function RecipeGenerator() {
       );
       setIsAuthenticated(true);
       fetchSavedRecipes();
+      fetchGroceryList();
       router.replace("/");
     }
   }, [searchParams, router]);
@@ -145,6 +124,7 @@ export default function RecipeGenerator() {
     localStorage.removeItem("picture");
     setIsAuthenticated(false);
     setSavedRecipes([]);
+    setGroceryItems([]);
   };
 
   const loadRandomRecipes = React.useCallback(async () => {
@@ -528,87 +508,86 @@ export default function RecipeGenerator() {
   //   }
   // }
 
-  const addToGroceryList = (
+  const addToGroceryList = async (
     recipeIngredients: string[],
     recipeName?: string,
     recipeId?: string,
   ) => {
-    setGroceryItems((prevItems) => {
-      const updatedItems = [...prevItems];
-      // If we have recipe info, create a recipe-specific entry
-      if (recipeName && recipeId) {
-        const existingRecipeIndex = updatedItems.findIndex(
-          (item) => item.id === recipeId,
-        );
-        if (existingRecipeIndex === -1) {
-          // Create new recipe entry
-          const newRecipeEntry: GroceryListRecipe = {
-            id: recipeId,
-            name: recipeName,
-            ingredients: recipeIngredients.map((ingredient) => ({
-              item: ingredient,
-              checked: false,
-            })),
-          };
-          updatedItems.push(newRecipeEntry);
-        } else {
-          // Add to existing recipe entry, avoiding duplicates
-          const existingEntry = updatedItems[existingRecipeIndex];
-          const newIngredients = recipeIngredients
-            .filter(
-              (ingredient) =>
-                !existingEntry.ingredients.some(
-                  (existing) =>
-                    existing.item.toLowerCase() === ingredient.toLowerCase(),
-                ),
-            )
-            .map((ingredient) => ({
-              item: ingredient,
-              checked: false,
-            }));
-          updatedItems[existingRecipeIndex] = {
-            ...existingEntry,
-            ingredients: [...existingEntry.ingredients, ...newIngredients],
-          };
-        }
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("Please log in to add items to your grocery list.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/groceryList", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          recipeIngredients,
+          recipeName,
+          recipeId,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGroceryItems(data.groceryList);
       } else {
-        // Fallback: add to miscellaneous if no recipe info provided
-        const miscId = "miscellaneous-items";
-        const miscIndex = updatedItems.findIndex((item) => item.id === miscId);
-        if (miscIndex === -1) {
-          // Create miscellaneous entry
-          const miscEntry: GroceryListRecipe = {
-            id: miscId,
-            name: "Miscellaneous Items",
-            ingredients: recipeIngredients.map((ingredient) => ({
-              item: ingredient,
-              checked: false,
-            })),
-          };
-          updatedItems.push(miscEntry);
-        } else {
-          // Add to existing miscellaneous entry, avoiding duplicates
-          const existingEntry = updatedItems[miscIndex];
-          const newIngredients = recipeIngredients
-            .filter(
-              (ingredient) =>
-                !existingEntry.ingredients.some(
-                  (existing) =>
-                    existing.item.toLowerCase() === ingredient.toLowerCase(),
-                ),
-            )
-            .map((ingredient) => ({
-              item: ingredient,
-              checked: false,
-            }));
-          updatedItems[miscIndex] = {
-            ...existingEntry,
-            ingredients: [...existingEntry.ingredients, ...newIngredients],
-          };
-        }
+        console.error("Failed to add ingredients to grocery list");
+        alert("Failed to add ingredients to grocery list");
       }
-      return updatedItems;
-    });
+    } catch (error) {
+      console.error("Error adding to grocery list:", error);
+      alert("Error adding ingredients to grocery list");
+    }
+  };
+
+  const updateGroceryList = async (
+    items: GroceryListRecipe[] | ((prevItems: GroceryListRecipe[]) => GroceryListRecipe[])
+  ) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("Please log in to manage your grocery list.");
+      return;
+    }
+
+    // Handle function updates
+    let updatedItems: GroceryListRecipe[];
+    if (typeof items === "function") {
+      updatedItems = items(groceryItems);
+    } else {
+      updatedItems = items;
+    }
+
+    // Optimistically update the UI
+    setGroceryItems(updatedItems);
+
+    try {
+      const response = await fetch("/api/groceryList", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          groceryList: updatedItems,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update grocery list");
+        // Revert on failure by fetching fresh data
+        fetchGroceryList();
+      }
+    } catch (error) {
+      console.error("Error updating grocery list:", error);
+      // Revert on failure by fetching fresh data
+      fetchGroceryList();
+    }
   };
 
   const viewRecipeDetails = (recipeId: string) => {
@@ -707,177 +686,30 @@ export default function RecipeGenerator() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="generator" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plus className="h-5 w-5 text-orange-500" />
-                  Add Your Ingredients
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter an ingredient (e.g., chicken, tomatoes, rice)"
-                    value={currentIngredient}
-                    onChange={(e) => setCurrentIngredient(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="flex-1"
-                    disabled={loading}
-                  />
-                  <Button
-                    onClick={addIngredient}
-                    className="bg-orange-500 hover:bg-orange-600"
-                    disabled={loading || !currentIngredient.trim()}
-                  >
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Plus className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {ingredients.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Your ingredients:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {ingredients.map((ingredient) => (
-                        <Badge
-                          key={ingredient}
-                          variant="secondary"
-                          className={`cursor-pointer ${
-                            invalidIngredients.includes(ingredient)
-                              ? "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200"
-                              : "bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-900 dark:text-orange-200"
-                          }`}
-                          onClick={() => removeIngredient(ingredient)}
-                        >
-                          {ingredient}
-                          {invalidIngredients.includes(ingredient) && (
-                            <span className="ml-1 text-xs">(not found)</span>
-                          )}
-                          <X className="h-3 w-3 ml-1" />
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {ingredientSuggestions.length > 0 && (
-                  <div className="space-y-3">
-                    {ingredientSuggestions.map((suggestion) => (
-                      <div
-                        key={suggestion.original}
-                        className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md"
-                      >
-                        <div className="flex items-start gap-2 mb-2">
-                          <Lightbulb className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                              &quot;{suggestion.original}&quot; not found. Did
-                              you mean:
-                            </p>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {suggestion.suggestions.map(
-                                (suggestedIngredient) => (
-                                  <Button
-                                    key={suggestedIngredient}
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-7 text-xs bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                                    onClick={() =>
-                                      replaceIngredient(
-                                        suggestion.original,
-                                        suggestedIngredient,
-                                      )
-                                    }
-                                  >
-                                    {suggestedIngredient}
-                                  </Button>
-                                ),
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {invalidIngredients.length > 0 &&
-                  ingredientSuggestions.length === 0 && (
-                    <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
-                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                        <strong>Note:</strong> Some ingredients couldn&apos;t be
-                        found in the database. Try using common ingredient names
-                        like &quot;chicken&quot;, &quot;onion&quot;,
-                        &quot;tomato&quot;, etc.
-                      </p>
-                    </div>
-                  )}
-              </CardContent>
-            </Card>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {ingredients.length > 0
-                    ? `Recipes with ${ingredients.filter((i) => !invalidIngredients.includes(i)).join(", ")}`
-                    : "Popular Recipes"}
-                </h2>
-                <Badge variant="outline" className="text-sm">
-                  {loading
-                    ? "Loading..."
-                    : `${filteredRecipes.length} recipes found`}
-                </Badge>
-              </div>
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
-                  <span className="ml-2 text-gray-600 dark:text-gray-400">
-                    Finding recipes with your ingredients...
-                  </span>
-                </div>
-              ) : filteredRecipes.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredRecipes.map((recipe) => (
-                    <RecipeCard
-                      key={recipe.id}
-                      recipe={recipe}
-                      onSaveAction={() => handleSaveRecipe(recipe, true)}
-                      onAddToGroceryAction={() =>
-                        addToGroceryList(
-                          recipe.ingredients,
-                          recipe.title,
-                          recipe.id,
-                        )
-                      }
-                      onViewDetailsAction={viewRecipeDetails}
-                      isSaved={savedRecipes.some((r) => r.id === recipe.id)}
-                    />
-                  ))}
-                </div>
-              ) : searchPerformed ? (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400 mb-2">
-                      No recipes found
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      {invalidIngredients.length === ingredients.length
-                        ? "None of the ingredients were found. Try the suggested alternatives above."
-                        : "Try different ingredient combinations or check spelling"}
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : null}
-            </div>
+          <TabsContent value="generator">
+            <GeneratorTab
+              ingredients={ingredients}
+              currentIngredient={currentIngredient}
+              recipes={recipes}
+              loading={loading}
+              searchPerformed={searchPerformed}
+              invalidIngredients={invalidIngredients}
+              ingredientSuggestions={ingredientSuggestions}
+              savedRecipes={savedRecipes}
+              setCurrentIngredient={setCurrentIngredient}
+              addIngredient={addIngredient}
+              removeIngredient={removeIngredient}
+              replaceIngredient={replaceIngredient}
+              handleKeyPress={handleKeyPress}
+              handleSaveRecipe={handleSaveRecipe}
+              addToGroceryList={addToGroceryList}
+              viewRecipeDetails={viewRecipeDetails}
+            />
           </TabsContent>
 
           <TabsContent value="saved">
-            <SavedRecipes
-              recipes={savedRecipes}
+            <SavedRecipesTab
+              savedRecipes={savedRecipes}
               onAddToGrocery={addToGroceryList}
               onViewDetails={viewRecipeDetails}
               onSaveRecipe={handleSaveRecipe}
@@ -885,9 +717,9 @@ export default function RecipeGenerator() {
           </TabsContent>
 
           <TabsContent value="grocery">
-            <GroceryList
-              items={groceryItems}
-              onUpdateItemsAction={setGroceryItems}
+            <GroceryListTab
+              groceryItems={groceryItems}
+              onUpdateItemsAction={updateGroceryList}
             />
           </TabsContent>
         </Tabs>
