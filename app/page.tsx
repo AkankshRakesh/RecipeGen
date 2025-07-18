@@ -24,6 +24,7 @@ import {
 } from "@/lib/types";
 import { Recipe } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function RecipeGenerator() {
   // State declarations (same as before)
@@ -58,10 +59,11 @@ export default function RecipeGenerator() {
           Authorization: `Bearer ${token}`,
         },
       });
-
+      
       if (response.ok) {
         const data = await response.json();
         setSavedRecipes(data.savedRecipes || []);
+        
       }
     } catch (error) {
       console.error("Error fetching saved recipes:", error);
@@ -417,7 +419,7 @@ export default function RecipeGenerator() {
 
   const handleSaveRecipe = async (recipe: Recipe, addNewSaved: boolean) => {
     const token = localStorage.getItem("authToken");
-    if (!token) return alert("Please log in first.");
+    if (!token) return toast("Please log in first.", {cancel: {label: "X", onClick: () => console.log('Cancel!'),}});
 
     const isAlreadySaved = savedRecipes.some((r) => r.id === recipe.id);
 
@@ -436,6 +438,33 @@ export default function RecipeGenerator() {
           setSavedRecipes((prev) => prev.filter((r) => r.id !== recipe.id));
         } else {
           setSavedRecipes((prev) => [...prev, recipe]);
+        }
+        if (addNewSaved) {
+                toast.success('Saved successfully!', {
+                duration: 3000,
+                style: {
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                },
+                cancel: {
+                  label: <span style={{ color: 'var(--foreground)' }}>X</span>,
+                  onClick: () => console.log('Cancel!'),
+                },
+                });
+              } else {
+                toast.success('Unsaved successfully!', {
+                duration: 3000,
+                style: {
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                },
+                cancel: {
+                  label: <span style={{ color: 'var(--foreground)' }}>X</span>,
+                  onClick: () => console.log('Cancel!'),
+                },
+                });
         }
       } else {
         console.error("Failed to save recipe");
@@ -515,7 +544,18 @@ export default function RecipeGenerator() {
   ) => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      alert("Please log in to add items to your grocery list.");
+      toast.warning('Please login to add grocery items', {
+        duration: 3000,
+        style: {
+          background: 'var(--background)',
+          color: 'var(--foreground)',
+          border: '1px solid var(--border)',
+        },
+        cancel: {
+          label: <span style={{ color: 'var(--foreground)' }}>X</span>,
+          onClick: () => console.log('Cancel!'),
+        },
+        });
       return;
     }
 
@@ -536,6 +576,18 @@ export default function RecipeGenerator() {
       if (response.ok) {
         const data = await response.json();
         setGroceryItems(data.groceryList);
+        toast.success('Ingredients added to grocery list!', {
+          duration: 3000,
+          style: {
+            background: 'var(--background)',
+            color: 'var(--foreground)',
+            border: '1px solid var(--border)',
+          },
+          cancel: {
+            label: <span style={{ color: 'var(--foreground)' }}>X</span>,
+            onClick: () => console.log('Cancel!'),
+          },
+        });
       } else {
         console.error("Failed to add ingredients to grocery list");
         alert("Failed to add ingredients to grocery list");
