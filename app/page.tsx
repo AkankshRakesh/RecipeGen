@@ -590,11 +590,33 @@ export default function RecipeGenerator() {
         });
       } else {
         console.error("Failed to add ingredients to grocery list");
-        alert("Failed to add ingredients to grocery list");
+        toast.error('Failed to add ingredients to grocery list', {
+          duration: 3000,
+          style: {
+            background: 'var(--background)',
+            color: 'var(--foreground)',
+            border: '1px solid var(--border)',
+          },
+          cancel: {
+            label: <span style={{ color: 'var(--foreground)' }}>X</span>,
+            onClick: () => console.log('Cancel!'),
+          },
+        });
       }
     } catch (error) {
       console.error("Error adding to grocery list:", error);
-      alert("Error adding ingredients to grocery list");
+      toast.error('Error adding ingredients to grocery list', {
+        duration: 3000,
+        style: {
+          background: 'var(--background)',
+          color: 'var(--foreground)',
+          border: '1px solid var(--border)',
+        },
+        cancel: {
+          label: <span style={{ color: 'var(--foreground)' }}>X</span>,
+          onClick: () => console.log('Cancel!'),
+        },
+      });
     }
   };
 
@@ -603,7 +625,18 @@ export default function RecipeGenerator() {
   ) => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      alert("Please log in to manage your grocery list.");
+      toast.warning('Please login to manage your grocery items', {
+        duration: 3000,
+        style: {
+          background: 'var(--background)',
+          color: 'var(--foreground)',
+          border: '1px solid var(--border)',
+        },
+        cancel: {
+          label: <span style={{ color: 'var(--foreground)' }}>X</span>,
+          onClick: () => console.log('Cancel!'),
+        },
+        });
       return;
     }
 
