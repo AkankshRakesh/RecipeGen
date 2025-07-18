@@ -6,9 +6,6 @@ import {
   X,
   ChefHat,
   Loader2,
-  Clock,
-  Users,
-  Star,
   Youtube,
   ExternalLink,
 } from "lucide-react";

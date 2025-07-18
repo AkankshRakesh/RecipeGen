@@ -600,7 +600,7 @@ export default function RecipeGenerator() {
     setSelectedRecipeId(null);
   };
 
-  const filteredRecipes = recipes;
+  // const filteredRecipes = recipes;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">

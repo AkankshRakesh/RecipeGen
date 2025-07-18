@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 import {
-  Clock,
-  Users,
   Star,
   Heart,
   ShoppingCart,
