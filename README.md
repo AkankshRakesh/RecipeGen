@@ -1,4 +1,4 @@
-# 🍳 [RecipeGen - AI-Powered Recipe Discovery Platform](https://recipegen-theta.vercel.app/)
+# 🍳 [RecipeGen - Smart Recipe Discovery Platform](https://recipegen-theta.vercel.app/)
 
 <div align="center">
   <img src="https://img.shields.io/badge/Next.js-13+-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
@@ -8,7 +8,7 @@
 </div>
 
 <div align="center">
-  <h3>Transform your available ingredients into delicious recipes with AI-powered suggestions</h3>
+  <h3>Transform your available ingredients into delicious recipes with algorithm-powered suggestions</h3>
   <p>A modern web application that helps you discover recipes based on what you have in your kitchen. Deployed at the link: https://recipegen-theta.vercel.app/</p>
 </div>
 
