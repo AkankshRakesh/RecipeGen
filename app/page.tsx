@@ -781,6 +781,7 @@ export default function RecipeGenerator() {
               invalidIngredients={invalidIngredients}
               ingredientSuggestions={ingredientSuggestions}
               savedRecipes={savedRecipes}
+              availableIngredients={availableIngredients}
               setCurrentIngredient={setCurrentIngredient}
               addIngredient={addIngredient}
               removeIngredient={removeIngredient}
