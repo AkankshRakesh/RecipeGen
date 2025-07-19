@@ -419,7 +419,17 @@ export default function RecipeGenerator() {
 
   const handleSaveRecipe = async (recipe: Recipe, addNewSaved: boolean) => {
     const token = localStorage.getItem("authToken");
-    if (!token) return toast("Please log in first.", {cancel: {label: "X", onClick: () => console.log('Cancel!'),}});
+    if (!token) return toast.warning('Please login to save recipe', {
+        duration: 3000,
+        style: {
+          background: 'var(--background)',
+          border: '1px solid var(--border)',
+        },
+        cancel: {
+          label: <span style={{ color: 'var(--foreground)', background: 'var(--destructive-foreground)' }}>X</span>,
+          onClick: () => console.log('Cancel!'),
+        },
+        });
 
     const isAlreadySaved = savedRecipes.some((r) => r.id === recipe.id);
 
@@ -444,7 +454,6 @@ export default function RecipeGenerator() {
                 duration: 3000,
                 style: {
                   background: 'var(--background)',
-                  color: 'var(--foreground)',
                   border: '1px solid var(--border)',
                 },
                 cancel: {
@@ -457,7 +466,6 @@ export default function RecipeGenerator() {
                 duration: 3000,
                 style: {
                   background: 'var(--background)',
-                  color: 'var(--foreground)',
                   border: '1px solid var(--border)',
                 },
                 cancel: {
@@ -548,7 +556,6 @@ export default function RecipeGenerator() {
         duration: 3000,
         style: {
           background: 'var(--background)',
-          color: 'var(--foreground)',
           border: '1px solid var(--border)',
         },
         cancel: {
@@ -580,7 +587,6 @@ export default function RecipeGenerator() {
           duration: 3000,
           style: {
             background: 'var(--background)',
-            color: 'var(--foreground)',
             border: '1px solid var(--border)',
           },
           cancel: {
@@ -594,7 +600,6 @@ export default function RecipeGenerator() {
           duration: 3000,
           style: {
             background: 'var(--background)',
-            color: 'var(--foreground)',
             border: '1px solid var(--border)',
           },
           cancel: {
@@ -609,7 +614,6 @@ export default function RecipeGenerator() {
         duration: 3000,
         style: {
           background: 'var(--background)',
-          color: 'var(--foreground)',
           border: '1px solid var(--border)',
         },
         cancel: {
@@ -629,7 +633,6 @@ export default function RecipeGenerator() {
         duration: 3000,
         style: {
           background: 'var(--background)',
-          color: 'var(--foreground)',
           border: '1px solid var(--border)',
         },
         cancel: {
