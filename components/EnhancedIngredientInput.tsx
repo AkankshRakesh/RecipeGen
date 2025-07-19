@@ -18,7 +18,6 @@ interface EnhancedIngredientInputProps {
   handleKeyPressAction: (e: React.KeyboardEvent) => void;
 }
 
-// Popular ingredients for quick selection
 const POPULAR_INGREDIENTS = [
   "chicken", "beef", "pork", "fish", "salmon", "eggs",
   "onion", "garlic", "tomato", "potato", "carrot", "bell pepper",
@@ -42,7 +41,6 @@ export function EnhancedIngredientInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter suggestions based on current input
   useEffect(() => {
     if (currentIngredient.trim() && availableIngredients.length > 0) {
       const query = currentIngredient.toLowerCase().trim();
@@ -55,15 +53,12 @@ export function EnhancedIngredientInput({
           const aLower = a.toLowerCase();
           const bLower = b.toLowerCase();
           
-          // Prioritize exact matches
           if (aLower === query) return -1;
           if (bLower === query) return 1;
           
-          // Then prioritize starts with
           if (aLower.startsWith(query) && !bLower.startsWith(query)) return -1;
           if (bLower.startsWith(query) && !aLower.startsWith(query)) return 1;
           
-          // Then alphabetical
           return aLower.localeCompare(bLower);
         })
         .slice(0, 8);
@@ -78,7 +73,6 @@ export function EnhancedIngredientInput({
     }
   }, [currentIngredient, availableIngredients, ingredients]);
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -107,7 +101,6 @@ export function EnhancedIngredientInput({
     setCurrentIngredientAction(suggestion);
     setIsDropdownOpen(false);
     setSelectedSuggestionIndex(-1);
-    // Auto-add the ingredient after a short delay
     setTimeout(() => {
       if (inputRef.current) {
         addIngredientAction();
@@ -123,7 +116,6 @@ export function EnhancedIngredientInput({
   };
 
 
-  // Get popular ingredients that haven't been added yet
   const availablePopularIngredients = POPULAR_INGREDIENTS.filter(
     ingredient => !ingredients.includes(ingredient.toLowerCase())
   ).slice(0, 12);
@@ -131,7 +123,6 @@ export function EnhancedIngredientInput({
   return (
     <Card className="relative">
       <CardContent className="p-6 space-y-4">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ChefHat className="h-5 w-5 text-orange-500" />
@@ -141,7 +132,6 @@ export function EnhancedIngredientInput({
           </div>
         </div>
 
-        {/* Input with autocomplete */}
         <div className="relative">
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -158,7 +148,6 @@ export function EnhancedIngredientInput({
                   }
                 }}
                 onBlur={(e) => {
-                  // Delay closing to allow clicking on suggestions
                   setTimeout(() => {
                     if (!dropdownRef.current?.contains(e.relatedTarget)) {
                       setIsDropdownOpen(false);
@@ -169,7 +158,6 @@ export function EnhancedIngredientInput({
                 disabled={loading}
               />
               
-              {/* Autocomplete dropdown */}
               {isDropdownOpen && filteredSuggestions.length > 0 && (
                 <div
                   ref={dropdownRef}
@@ -207,7 +195,6 @@ export function EnhancedIngredientInput({
           </div>
         </div>
 
-        {/* Popular ingredients */}
         {ingredients.length === 0 && availablePopularIngredients.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
@@ -232,8 +219,6 @@ export function EnhancedIngredientInput({
             </div>
           </div>
         )}
-
-        {/* Current ingredients */}
         {ingredients.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">

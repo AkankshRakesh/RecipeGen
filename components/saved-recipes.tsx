@@ -1,6 +1,6 @@
 import { BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RecipeCard } from "@/components/recipe-card";
+import { RecipeCard } from "@/components/RecipeCard";
 
 interface Recipe {
   id: string;
