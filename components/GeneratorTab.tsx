@@ -2,8 +2,8 @@ import { Search, Loader2, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RecipeCard } from "@/components/recipe-card";
-import { EnhancedIngredientInput } from "@/components/enhanced-ingredient-input";
+import { RecipeCard } from "@/components/RecipeCard";
+import { EnhancedIngredientInput } from "@/components/EnhancedIngredientInput";
 import { Recipe } from "@/lib/types";
 
 interface GeneratorTabProps {

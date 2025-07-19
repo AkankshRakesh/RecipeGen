@@ -15,8 +15,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GeneratorTab } from "@/components/GeneratorTab";
-import { SavedRecipesTab } from "@/components/SavedRecipes";
-import { GroceryListTab } from "@/components/GroceryList";
+import { SavedRecipesTab } from "@/components/SavedRecipesLayout";
+import { GroceryListTab } from "@/components/GroceryListLayout";
 import {
   GroceryListRecipe,
   IngredientSuggestion,
