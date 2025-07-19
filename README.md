@@ -12,7 +12,6 @@
   <p>A modern web application that helps you discover recipes based on what you have in your kitchen</p>
 </div>
 
----
 
 ## ✨ Features
 
@@ -50,7 +49,6 @@
 - **Cooking Metadata**: Prep time, difficulty level, servings, and ratings
 - **External Links**: Access to video tutorials and original sources
 
----
 
 ## 🚀 Quick Start
 
@@ -105,7 +103,6 @@
    
    Navigate to [http://localhost:3000](http://localhost:3000)
 
----
 
 ## 🏗️ Tech Stack
 
@@ -131,7 +128,6 @@
 - **Prettier** - Code formatting
 - **TypeScript** - Static type checking
 
----
 
 ## 📁 Project Structure
 
@@ -164,7 +160,6 @@ RecipeGen/
 └── public/                       # Static assets
 ```
 
----
 
 ## 🔧 API Endpoints
 
@@ -182,7 +177,6 @@ RecipeGen/
 - `GET /api/groceryList` - Get user's grocery list
 - `PUT /api/groceryList` - Update grocery list items
 
----
 
 ## 🎯 Usage Guide
 
@@ -206,7 +200,6 @@ RecipeGen/
 3. Maintain persistent grocery lists
 4. Personalized recipe recommendations
 
----
 
 ## 🌐 External Integrations
 
@@ -221,7 +214,6 @@ RecipeGen/
 - Profile information access
 - Simplified user onboarding
 
----
 
 ## 🔒 Security Features
 
@@ -231,7 +223,6 @@ RecipeGen/
 - **CORS Protection** - Cross-origin request security
 - **Environment Variables** - Secure credential storage
 
----
 
 ## 🚀 Deployment
 
@@ -246,7 +237,6 @@ RecipeGen/
 - Build command: `npm run build`
 - Start command: `npm start`
 
----
 
 ## 🤝 Contributing
 
