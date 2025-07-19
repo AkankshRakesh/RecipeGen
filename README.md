@@ -9,7 +9,7 @@
 
 <div align="center">
   <h3>Transform your available ingredients into delicious recipes with AI-powered suggestions</h3>
-  <p>A modern web application that helps you discover recipes based on what you have in your kitchen</p>
+  <p>A modern web application that helps you discover recipes based on what you have in your kitchen. Deployed at the link: https://recipegen-theta.vercel.app/</p>
 </div>
 
 
