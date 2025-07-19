@@ -267,30 +267,6 @@ We welcome contributions! Please follow these steps:
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **TheMealDB** - For providing the comprehensive recipe database
-- **Vercel** - For seamless deployment platform
-- **MongoDB** - For reliable cloud database hosting
-- **Next.js Team** - For the amazing React framework
-- **Tailwind CSS** - For the utility-first CSS framework
-
----
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/AkankshRakesh/RecipeGen/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/AkankshRakesh/RecipeGen/discussions)
-- **Email**: [your-email@example.com](mailto:your-email@example.com)
-
----
-
 <div align="center">
   <p>Made with ❤️ by <a href="https://github.com/AkankshRakesh">Akanksh Rakesh</a></p>
   <p>⭐ Star this repository if you found it helpful!</p>
