@@ -8,7 +8,7 @@ interface SavedRecipesTabProps {
   onAddToGrocery: (
     ingredients: string[],
     recipeName?: string,
-    recipeId?: string
+    recipeId?: string,
   ) => void;
   onViewDetails: (recipeId: string) => void;
   onSaveRecipe: (recipe: Recipe, addNewSaved: boolean) => void;

@@ -1,13 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  Star,
-  Heart,
-  ShoppingCart,
-  MapPin,
-  Eye,
-} from "lucide-react";
+import { Star, Heart, ShoppingCart, MapPin, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -76,14 +70,13 @@ export function RecipeCard({
         <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
           {recipe.description}
         </p>
-        
       </CardHeader>
 
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-          <span>{recipe.area}</span>
+            <span>{recipe.area}</span>
           </div>
           <div className="flex items-center gap-1">
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />

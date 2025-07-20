@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  X,
-  ChefHat,
-  Loader2,
-  Youtube,
-  ExternalLink,
-} from "lucide-react";
+import { X, ChefHat, Loader2, Youtube, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -193,16 +187,16 @@ export function RecipeDetailModal({
                 <div className="flex items-center gap-2 text-white/90">
                   <div className="flex items-center gap-1">
                     <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
-                    {recipe.strCategory}
-                  </Badge>
+                      {recipe.strCategory}
+                    </Badge>
                   </div>
                   <div className="flex items-center gap-1">
                     <Badge
-                    variant="outline"
-                    className="bg-white/20 border-white/30 text-white"
-                  >
-                    {recipe.strArea}
-                  </Badge>
+                      variant="outline"
+                      className="bg-white/20 border-white/30 text-white"
+                    >
+                      {recipe.strArea}
+                    </Badge>
                   </div>
                 </div>
               </div>

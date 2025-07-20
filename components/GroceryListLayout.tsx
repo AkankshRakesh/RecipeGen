@@ -4,7 +4,9 @@ import { GroceryListRecipe } from "@/lib/types";
 interface GroceryListTabProps {
   groceryItems: GroceryListRecipe[];
   onUpdateItemsAction: (
-    items: GroceryListRecipe[] | ((prevItems: GroceryListRecipe[]) => GroceryListRecipe[])
+    items:
+      | GroceryListRecipe[]
+      | ((prevItems: GroceryListRecipe[]) => GroceryListRecipe[]),
   ) => void;
 }
 

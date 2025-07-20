@@ -19,10 +19,30 @@ interface EnhancedIngredientInputProps {
 }
 
 const POPULAR_INGREDIENTS = [
-  "chicken", "beef", "pork", "fish", "salmon", "eggs",
-  "onion", "garlic", "tomato", "potato", "carrot", "bell pepper",
-  "rice", "pasta", "bread", "flour", "milk", "cheese",
-  "olive oil", "salt", "pepper", "basil", "oregano", "thyme"
+  "chicken",
+  "beef",
+  "pork",
+  "fish",
+  "salmon",
+  "eggs",
+  "onion",
+  "garlic",
+  "tomato",
+  "potato",
+  "carrot",
+  "bell pepper",
+  "rice",
+  "pasta",
+  "bread",
+  "flour",
+  "milk",
+  "cheese",
+  "olive oil",
+  "salt",
+  "pepper",
+  "basil",
+  "oregano",
+  "thyme",
 ];
 
 export function EnhancedIngredientInput({
@@ -45,24 +65,25 @@ export function EnhancedIngredientInput({
     if (currentIngredient.trim() && availableIngredients.length > 0) {
       const query = currentIngredient.toLowerCase().trim();
       const suggestions = availableIngredients
-        .filter(ingredient => 
-          ingredient.toLowerCase().includes(query) &&
-          !ingredients.includes(ingredient.toLowerCase())
+        .filter(
+          (ingredient) =>
+            ingredient.toLowerCase().includes(query) &&
+            !ingredients.includes(ingredient.toLowerCase()),
         )
         .sort((a, b) => {
           const aLower = a.toLowerCase();
           const bLower = b.toLowerCase();
-          
+
           if (aLower === query) return -1;
           if (bLower === query) return 1;
-          
+
           if (aLower.startsWith(query) && !bLower.startsWith(query)) return -1;
           if (bLower.startsWith(query) && !aLower.startsWith(query)) return 1;
-          
+
           return aLower.localeCompare(bLower);
         })
         .slice(0, 8);
-      
+
       setFilteredSuggestions(suggestions);
       setIsDropdownOpen(suggestions.length > 0);
       setSelectedSuggestionIndex(-1);
@@ -76,12 +97,12 @@ export function EnhancedIngredientInput({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedSuggestionIndex(prev => 
-        prev < filteredSuggestions.length - 1 ? prev + 1 : prev
+      setSelectedSuggestionIndex((prev) =>
+        prev < filteredSuggestions.length - 1 ? prev + 1 : prev,
       );
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+      setSelectedSuggestionIndex((prev) => (prev > 0 ? prev - 1 : -1));
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (selectedSuggestionIndex >= 0) {
@@ -115,9 +136,8 @@ export function EnhancedIngredientInput({
     }
   };
 
-
   const availablePopularIngredients = POPULAR_INGREDIENTS.filter(
-    ingredient => !ingredients.includes(ingredient.toLowerCase())
+    (ingredient) => !ingredients.includes(ingredient.toLowerCase()),
   ).slice(0, 12);
 
   return (
@@ -157,7 +177,7 @@ export function EnhancedIngredientInput({
                 className="pl-10 pr-4 h-11 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 focus:border-orange-500 dark:focus:border-orange-400 transition-colors"
                 disabled={loading}
               />
-              
+
               {isDropdownOpen && filteredSuggestions.length > 0 && (
                 <div
                   ref={dropdownRef}
@@ -184,7 +204,7 @@ export function EnhancedIngredientInput({
                 </div>
               )}
             </div>
-            
+
             <Button
               onClick={addIngredientAction}
               className="bg-orange-500 hover:bg-orange-600 text-white h-11 px-6 transition-colors"
@@ -241,7 +261,6 @@ export function EnhancedIngredientInput({
             </div>
           </div>
         )}
-
       </CardContent>
     </Card>
   );

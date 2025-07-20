@@ -36,7 +36,9 @@ export default function RecipeGenerator() {
   const [loading, setLoading] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const [invalidIngredients, setInvalidIngredients] = useState<string[]>([]);
-  const [availableIngredients, setAvailableIngredients] = useState<string[]>([]);
+  const [availableIngredients, setAvailableIngredients] = useState<string[]>(
+    [],
+  );
   const [ingredientSuggestions, setIngredientSuggestions] = useState<
     IngredientSuggestion[]
   >([]);
@@ -59,11 +61,10 @@ export default function RecipeGenerator() {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setSavedRecipes(data.savedRecipes || []);
-        
       }
     } catch (error) {
       console.error("Error fetching saved recipes:", error);
@@ -419,17 +420,27 @@ export default function RecipeGenerator() {
 
   const handleSaveRecipe = async (recipe: Recipe, addNewSaved: boolean) => {
     const token = localStorage.getItem("authToken");
-    if (!token) return toast.warning('Please login to save recipe', {
+    if (!token)
+      return toast.warning("Please login to save recipe", {
         duration: 3000,
         style: {
-          background: 'var(--background)',
-          border: '1px solid var(--border)',
+          background: "var(--background)",
+          border: "1px solid var(--border)",
         },
         cancel: {
-          label: <span style={{ color: 'var(--foreground)', background: 'var(--destructive-foreground)' }}>X</span>,
-          onClick: () => console.log('Cancel!'),
+          label: (
+            <span
+              style={{
+                color: "var(--foreground)",
+                background: "var(--destructive-foreground)",
+              }}
+            >
+              X
+            </span>
+          ),
+          onClick: () => console.log("Cancel!"),
         },
-        });
+      });
 
     const isAlreadySaved = savedRecipes.some((r) => r.id === recipe.id);
 
@@ -450,29 +461,29 @@ export default function RecipeGenerator() {
           setSavedRecipes((prev) => [...prev, recipe]);
         }
         if (addNewSaved) {
-                toast.success('Saved successfully!', {
-                duration: 3000,
-                style: {
-                  background: 'var(--background)',
-                  border: '1px solid var(--border)',
-                },
-                cancel: {
-                  label: <span style={{ color: 'var(--foreground)' }}>X</span>,
-                  onClick: () => console.log('Cancel!'),
-                },
-                });
-              } else {
-                toast.success('Unsaved successfully!', {
-                duration: 3000,
-                style: {
-                  background: 'var(--background)',
-                  border: '1px solid var(--border)',
-                },
-                cancel: {
-                  label: <span style={{ color: 'var(--foreground)' }}>X</span>,
-                  onClick: () => console.log('Cancel!'),
-                },
-                });
+          toast.success("Saved successfully!", {
+            duration: 3000,
+            style: {
+              background: "var(--background)",
+              border: "1px solid var(--border)",
+            },
+            cancel: {
+              label: <span style={{ color: "var(--foreground)" }}>X</span>,
+              onClick: () => console.log("Cancel!"),
+            },
+          });
+        } else {
+          toast.success("Unsaved successfully!", {
+            duration: 3000,
+            style: {
+              background: "var(--background)",
+              border: "1px solid var(--border)",
+            },
+            cancel: {
+              label: <span style={{ color: "var(--foreground)" }}>X</span>,
+              onClick: () => console.log("Cancel!"),
+            },
+          });
         }
       } else {
         console.error("Failed to save recipe");
@@ -552,17 +563,17 @@ export default function RecipeGenerator() {
   ) => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      toast.warning('Please login to add grocery items', {
+      toast.warning("Please login to add grocery items", {
         duration: 3000,
         style: {
-          background: 'var(--background)',
-          border: '1px solid var(--border)',
+          background: "var(--background)",
+          border: "1px solid var(--border)",
         },
         cancel: {
-          label: <span style={{ color: 'var(--foreground)' }}>X</span>,
-          onClick: () => console.log('Cancel!'),
+          label: <span style={{ color: "var(--foreground)" }}>X</span>,
+          onClick: () => console.log("Cancel!"),
         },
-        });
+      });
       return;
     }
 
@@ -583,63 +594,65 @@ export default function RecipeGenerator() {
       if (response.ok) {
         const data = await response.json();
         setGroceryItems(data.groceryList);
-        toast.success('Ingredients added to grocery list!', {
+        toast.success("Ingredients added to grocery list!", {
           duration: 3000,
           style: {
-            background: 'var(--background)',
-            border: '1px solid var(--border)',
+            background: "var(--background)",
+            border: "1px solid var(--border)",
           },
           cancel: {
-            label: <span style={{ color: 'var(--foreground)' }}>X</span>,
-            onClick: () => console.log('Cancel!'),
+            label: <span style={{ color: "var(--foreground)" }}>X</span>,
+            onClick: () => console.log("Cancel!"),
           },
         });
       } else {
         console.error("Failed to add ingredients to grocery list");
-        toast.error('Failed to add ingredients to grocery list', {
+        toast.error("Failed to add ingredients to grocery list", {
           duration: 3000,
           style: {
-            background: 'var(--background)',
-            border: '1px solid var(--border)',
+            background: "var(--background)",
+            border: "1px solid var(--border)",
           },
           cancel: {
-            label: <span style={{ color: 'var(--foreground)' }}>X</span>,
-            onClick: () => console.log('Cancel!'),
+            label: <span style={{ color: "var(--foreground)" }}>X</span>,
+            onClick: () => console.log("Cancel!"),
           },
         });
       }
     } catch (error) {
       console.error("Error adding to grocery list:", error);
-      toast.error('Error adding ingredients to grocery list', {
+      toast.error("Error adding ingredients to grocery list", {
         duration: 3000,
         style: {
-          background: 'var(--background)',
-          border: '1px solid var(--border)',
+          background: "var(--background)",
+          border: "1px solid var(--border)",
         },
         cancel: {
-          label: <span style={{ color: 'var(--foreground)' }}>X</span>,
-          onClick: () => console.log('Cancel!'),
+          label: <span style={{ color: "var(--foreground)" }}>X</span>,
+          onClick: () => console.log("Cancel!"),
         },
       });
     }
   };
 
   const updateGroceryList = async (
-    items: GroceryListRecipe[] | ((prevItems: GroceryListRecipe[]) => GroceryListRecipe[])
+    items:
+      | GroceryListRecipe[]
+      | ((prevItems: GroceryListRecipe[]) => GroceryListRecipe[]),
   ) => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      toast.warning('Please login to manage your grocery items', {
+      toast.warning("Please login to manage your grocery items", {
         duration: 3000,
         style: {
-          background: 'var(--background)',
-          border: '1px solid var(--border)',
+          background: "var(--background)",
+          border: "1px solid var(--border)",
         },
         cancel: {
-          label: <span style={{ color: 'var(--foreground)' }}>X</span>,
-          onClick: () => console.log('Cancel!'),
+          label: <span style={{ color: "var(--foreground)" }}>X</span>,
+          onClick: () => console.log("Cancel!"),
         },
-        });
+      });
       return;
     }
 

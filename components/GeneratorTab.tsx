@@ -18,7 +18,7 @@ interface GeneratorTabProps {
     suggestions: string[];
   }[];
   savedRecipes: Recipe[];
-  availableIngredients: string[]; 
+  availableIngredients: string[];
   setCurrentIngredient: (value: string) => void;
   addIngredient: () => void;
   removeIngredient: (ingredient: string) => void;
@@ -28,7 +28,7 @@ interface GeneratorTabProps {
   addToGroceryList: (
     ingredients: string[],
     recipeName?: string,
-    recipeId?: string
+    recipeId?: string,
   ) => void;
   viewRecipeDetails: (recipeId: string) => void;
 }
@@ -79,8 +79,7 @@ export function GeneratorTab({
                   <Lightbulb className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                      &quot;{suggestion.original}&quot; not found. Did you
-                      mean:
+                      &quot;{suggestion.original}&quot; not found. Did you mean:
                     </p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {suggestion.suggestions.map((suggestedIngredient) => (
@@ -92,7 +91,7 @@ export function GeneratorTab({
                           onClick={() =>
                             replaceIngredient(
                               suggestion.original,
-                              suggestedIngredient
+                              suggestedIngredient,
                             )
                           }
                         >
@@ -112,8 +111,8 @@ export function GeneratorTab({
         <Card className="border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
           <CardContent className="p-3">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              <strong>Note:</strong> Some ingredients couldn&apos;t be found
-              in the database. Try using common ingredient names like
+              <strong>Note:</strong> Some ingredients couldn&apos;t be found in
+              the database. Try using common ingredient names like
               &quot;chicken&quot;, &quot;onion&quot;, &quot;tomato&quot;, etc.
             </p>
           </CardContent>
@@ -148,11 +147,7 @@ export function GeneratorTab({
                 recipe={recipe}
                 onSaveAction={() => handleSaveRecipe(recipe, true)}
                 onAddToGroceryAction={() =>
-                  addToGroceryList(
-                    recipe.ingredients,
-                    recipe.title,
-                    recipe.id
-                  )
+                  addToGroceryList(recipe.ingredients, recipe.title, recipe.id)
                 }
                 onViewDetailsAction={viewRecipeDetails}
                 isSaved={savedRecipes.some((r) => r.id === recipe.id)}

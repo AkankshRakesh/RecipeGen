@@ -55,7 +55,9 @@ export function SavedRecipes({
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
-              onSaveAction={() => {onSaveRecipe(recipe, false)}} // Already saved
+              onSaveAction={() => {
+                onSaveRecipe(recipe, false);
+              }} // Already saved
               onAddToGroceryAction={() =>
                 onAddToGrocery(recipe.ingredients, recipe.title, recipe.id)
               }
