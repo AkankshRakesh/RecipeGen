@@ -40,18 +40,18 @@ export async function POST(req: NextRequest) {
       // Remove recipe from savedRecipes array
       await usersCollection.updateOne(
         { email },
-        { 
-          $pull: { 
-            savedRecipes: { id: recipe.id } 
-          } 
-        }
+        {
+          $pull: {
+            savedRecipes: { id: recipe.id },
+          },
+        },
       );
       return NextResponse.json({ message: "Recipe unsaved" });
     } else {
       // Add recipe if isSaved is false (meaning we want to save)
       await usersCollection.updateOne(
         { email },
-        { $addToSet: { savedRecipes: recipe } } 
+        { $addToSet: { savedRecipes: recipe } },
       );
       return NextResponse.json({ message: "Recipe saved" });
     }
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     console.error("Database operation failed:", error);
     return NextResponse.json(
       { error: "Failed to update saved recipes" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -83,8 +83,10 @@ export async function GET(req: NextRequest) {
   const db = client.db("recipegen");
   const usersCollection = db.collection<UserDocument>("users");
 
-  const user = await usersCollection
-    .findOne({ email }, { projection: { savedRecipes: 1, _id: 0 } });
+  const user = await usersCollection.findOne(
+    { email },
+    { projection: { savedRecipes: 1, _id: 0 } },
+  );
 
   return NextResponse.json({ savedRecipes: user?.savedRecipes || [] });
 }

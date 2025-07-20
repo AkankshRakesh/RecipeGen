@@ -20,8 +20,8 @@ interface GroceryItem {
 }
 
 interface GroceryListRecipe {
-  id: string; 
-  name: string; 
+  id: string;
+  name: string;
   ingredients: GroceryItem[];
 }
 
@@ -71,8 +71,8 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
             ing.item.toLowerCase() === newItem.trim().toLowerCase(),
         );
         if (existingItem) {
-          setNewItem(""); 
-          return prevItems; 
+          setNewItem("");
+          return prevItems;
         }
 
         updatedItems[miscRecipeIndex].ingredients.push({
@@ -99,7 +99,7 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
           }
           return recipeEntry;
         })
-        .filter((recipeEntry) => recipeEntry.ingredients.length > 0); 
+        .filter((recipeEntry) => recipeEntry.ingredients.length > 0);
     });
   };
 
@@ -134,7 +134,7 @@ export function GroceryList({ items, onUpdateItemsAction }: GroceryListProps) {
           ...recipeEntry,
           ingredients: recipeEntry.ingredients.filter((ing) => !ing.checked),
         }))
-        .filter((recipeEntry) => recipeEntry.ingredients.length > 0); 
+        .filter((recipeEntry) => recipeEntry.ingredients.length > 0);
     });
   };
 

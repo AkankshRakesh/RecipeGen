@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
   const { recipeIngredients, recipeName, recipeId } = await req.json();
 
   if (!recipeIngredients || !Array.isArray(recipeIngredients)) {
-    return NextResponse.json({ error: "Missing or invalid ingredients" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing or invalid ingredients" },
+      { status: 400 },
+    );
   }
 
   const client = await clientPromise;
@@ -57,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (recipeName && recipeId) {
       // Add ingredients under specific recipe
       const existingRecipeIndex = updatedGroceryList.findIndex(
-        (item) => item.id === recipeId
+        (item) => item.id === recipeId,
       );
 
       if (existingRecipeIndex === -1) {
@@ -79,8 +82,8 @@ export async function POST(req: NextRequest) {
             (ingredient: string) =>
               !existingEntry.ingredients.some(
                 (existing) =>
-                  existing.item.toLowerCase() === ingredient.toLowerCase()
-              )
+                  existing.item.toLowerCase() === ingredient.toLowerCase(),
+              ),
           )
           .map((ingredient: string) => ({
             item: ingredient,
@@ -95,7 +98,9 @@ export async function POST(req: NextRequest) {
     } else {
       // Add to miscellaneous items
       const miscId = "miscellaneous-items";
-      const miscIndex = updatedGroceryList.findIndex((item) => item.id === miscId);
+      const miscIndex = updatedGroceryList.findIndex(
+        (item) => item.id === miscId,
+      );
 
       if (miscIndex === -1) {
         // Create miscellaneous entry
@@ -116,8 +121,8 @@ export async function POST(req: NextRequest) {
             (ingredient: string) =>
               !existingEntry.ingredients.some(
                 (existing) =>
-                  existing.item.toLowerCase() === ingredient.toLowerCase()
-              )
+                  existing.item.toLowerCase() === ingredient.toLowerCase(),
+              ),
           )
           .map((ingredient: string) => ({
             item: ingredient,
@@ -135,19 +140,18 @@ export async function POST(req: NextRequest) {
     await groceryCollection.updateOne(
       { email },
       { $set: { groceryList: updatedGroceryList } },
-      { upsert: true }
+      { upsert: true },
     );
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Ingredients added to grocery list",
-      groceryList: updatedGroceryList 
+      groceryList: updatedGroceryList,
     });
-
   } catch (error) {
     console.error("Database operation failed:", error);
     return NextResponse.json(
       { error: "Failed to update grocery list" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -174,15 +178,14 @@ export async function GET(req: NextRequest) {
   try {
     const userGroceryList = await groceryCollection.findOne({ email });
 
-    return NextResponse.json({ 
-      groceryList: userGroceryList?.groceryList || [] 
+    return NextResponse.json({
+      groceryList: userGroceryList?.groceryList || [],
     });
-
   } catch (error) {
     console.error("Database operation failed:", error);
     return NextResponse.json(
       { error: "Failed to fetch grocery list" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -204,7 +207,10 @@ export async function PUT(req: NextRequest) {
   const { groceryList } = await req.json();
 
   if (!groceryList || !Array.isArray(groceryList)) {
-    return NextResponse.json({ error: "Invalid grocery list data" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid grocery list data" },
+      { status: 400 },
+    );
   }
 
   const client = await clientPromise;
@@ -215,19 +221,18 @@ export async function PUT(req: NextRequest) {
     await groceryCollection.updateOne(
       { email },
       { $set: { groceryList } },
-      { upsert: true }
+      { upsert: true },
     );
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Grocery list updated successfully",
-      groceryList 
+      groceryList,
     });
-
   } catch (error) {
     console.error("Database operation failed:", error);
     return NextResponse.json(
       { error: "Failed to update grocery list" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
