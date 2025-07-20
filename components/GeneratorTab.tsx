@@ -15,7 +15,7 @@ interface GeneratorTabProps {
   invalidIngredients: string[];
   ingredientSuggestions: {
     original: string;
-    suggestions: string[];
+    suggestions: string[]; 
   }[];
   savedRecipes: Recipe[];
   availableIngredients: string[];
